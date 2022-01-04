@@ -12,5 +12,5 @@
 * 1回のSubmissionで登録するオブジェクトの数を200程度になるように分けて登録する
 * xmlファイルを自身で作成･編集して登録する
 
-なおxmlファイルの作成支援用ツールとしては、DDBJから[submission-excel2xml](https://github.com/ddbj/submission-excel2xml)が提供されています。
+xmlファイルの作成には、DDBJ提供の支援ツール[submission-excel2xml](https://github.com/ddbj/submission-excel2xml)がおすすめです。
 
