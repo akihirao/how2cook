@@ -13,7 +13,7 @@ output:
 # 日本周辺の海底地形図をRで描く
 
 ## 1．ライブラリーの読み込み
-* これらのライブラリを事前にインストールしてください
+* これらのRライブラリを事前にインストールしてください
 
 ```{r message = FALSE, warning = FALSE, echo = TRUE}
 library(sp)
