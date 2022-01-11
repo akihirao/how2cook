@@ -2,7 +2,7 @@
 
 ## 1．ライブラリーの読み込み
 
--   これらのライブラリがインストールされていない場合、インストールしてください
+-   これらのライブラリを事前にインストールしてください
 
 ``` r
 library(sp)
@@ -45,19 +45,19 @@ colbr <- function(x, b1=50, b2=50, r1=-2, r2=-2) {
 blue.col <- colorRampPalette(c("darkblue", "lightblue"))
 ```
 
-## 4．海底地形データの読み込み
+## 4．日本周辺の海底地形データの読み込み
 
--   NOAAが提供するフリーのデジタル地形データETOPO1(WGS84回転楕円体に準拠した全球1分メッシュ,
-    格子点数4億6656個:
-    <a href="https://www.ngdc.noaa.gov/mgg/global)を使用" class="uri">https://www.ngdc.noaa.gov/mgg/global)を使用</a>　
--   オリジナルのETOPO1(ETOPO1_Bed_g\_geotiff.tif)はファイルサイズが大きいので、日本周辺域（東経115°—160°,
-    北緯25°-60°）を抽出したtifを使用。
-
-#ETOPO1_geo \<- raster(“ETOPO1_Bed_g\_geotiff.tif”) #JPN_ext \<-
-extent(125,150,25,60) #ETOPO01_JPN_geo \<- crop(ETOPO1_geo, JPN_ext)
-#writeRaster(ETOPO01_JPN_geo, “ETOPO1_geo_JPN.tif”, overwrite=T)
+-   元データはNOAA提供のETOPO1(<https://www.ngdc.noaa.gov/mgg/global>)
+-   ETOPO1の精度はWGS84回転楕円体に準拠した全球1分メッシュ,
+    格子点数4億6656個
+-   オリジナルのETOPO1(ETOPO1_Bed_g\_geotiff.tif)はサイズが大きいので、日本周辺域（東経115°—160°,
+    北緯25°-60°）を切り出したデータを使用。
 
 ``` r
+#ETOPO1_geo <- raster("ETOPO1_Bed_g_geotiff.tif")
+#JPN_ext <- extent(125,150,25,60)
+#ETOPO01_JPN_geo <- crop(ETOPO1_geo, JPN_ext)
+#writeRaster(ETOPO01_JPN_geo, "ETOPO1_geo_JPN.tif", overwrite=T)
 ETOPO1_geo_JPN <- raster("ETOPO1_geo_JPN.tif")
 ```
 
