@@ -17,11 +17,11 @@ library(reshape2)
 
 ## 2．深度・標高のカラーリング用関数の定義
 
-<https://www.benjaminbell.co.uk/2019/08/bathymetric-maps-in-r-colour-palettes.html>
-Function to calculate colour break points x = raster, b1 & b2 = number
-of divisions for each sequence, r1 & r2 = rounding value
+参照元(<https://www.benjaminbell.co.uk/2019/08/bathymetric-maps-in-r-colour-palettes.html>)
 
 ``` r
+# Function to calculate colour break points
+# x = raster, b1 & b2 = number of divisions for each sequence, r1 & r2 = rounding value
 colbr <- function(x, b1=50, b2=50, r1=-2, r2=-2) {
      # Min/max values of the raster (x)
     mi <- cellStats(x, stat="min")-100
