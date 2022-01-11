@@ -1,4 +1,4 @@
-# Rで海底地形図を描く
+# 日本周辺の海底地形図をRで描く
 
 ## 1．ライブラリーの読み込み
 
@@ -17,7 +17,7 @@ library(reshape2)
 
 ## 2．深度・標高のカラーリング用関数の定義
 
-参照元(<https://www.benjaminbell.co.uk/2019/08/bathymetric-maps-in-r-colour-palettes.html>)
+参照サイト(<https://www.benjaminbell.co.uk/2019/08/bathymetric-maps-in-r-colour-palettes.html>)
 
 ``` r
 # Function to calculate colour break points
@@ -47,11 +47,10 @@ blue.col <- colorRampPalette(c("darkblue", "lightblue"))
 
 ## 4．日本周辺の海底地形データの読み込み
 
--   元データはNOAA提供のETOPO1(<https://www.ngdc.noaa.gov/mgg/global>)
--   ETOPO1の精度はWGS84回転楕円体に準拠した全球1分メッシュ,
-    格子点数4億6656個
--   オリジナルのETOPO1(ETOPO1_Bed_g\_geotiff.tif)はサイズが大きいので、日本周辺域（東経115°—160°,
+-   NOAA提供のETOPO1(<a href="https://www.ngdc.noaa.gov/mgg/global)から日本周辺域（東経115" class="uri">https://www.ngdc.noaa.gov/mgg/global)から日本周辺域（東経115</a>°—160°,
     北緯25°-60°）を切り出したデータを使用。
+-   ETOPO1はフリーで公開されており、WGS84回転楕円体に準拠した全球1分メッシュ,
+    格子点数4億6656個のデータから構成される。
 
 ``` r
 #ETOPO1_geo <- raster("ETOPO1_Bed_g_geotiff.tif")
