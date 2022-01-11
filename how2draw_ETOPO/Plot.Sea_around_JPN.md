@@ -1,4 +1,6 @@
-# 1．ライブラリーの読み込み
+# Rで海底地形図を描く
+
+## 1．ライブラリーの読み込み
 
 -   これらのライブラリがインストールされていない場合、インストールしてください
 
@@ -13,7 +15,7 @@ library(ggplot2)
 library(reshape2)
 ```
 
-# 2．深度・標高のカラーリング用関数の定義
+## 2．深度・標高のカラーリング用関数の定義
 
 <https://www.benjaminbell.co.uk/2019/08/bathymetric-maps-in-r-colour-palettes.html>
 Function to calculate colour break points x = raster, b1 & b2 = number
@@ -37,30 +39,35 @@ colbr <- function(x, b1=50, b2=50, r1=-2, r2=-2) {
 }
 ```
 
-# 3．海域/陸域のカラーパレットの定義
+## 3．海域/陸域のカラーパレットの定義
 
 ``` r
 blue.col <- colorRampPalette(c("darkblue", "lightblue"))
 ```
 
-# 4．海底地形データの読み込み
+## 4．海底地形データの読み込み
 
--   オリジナルはETOPO1(NOAAより作成されたWGS84回転楕円体に準拠した全球1分メッシュ,
-    格子点数4億6656個のデジタル地形データ):　<https://www.ngdc.noaa.gov/mgg/global>
+-   NOAAが提供するフリーのデジタル地形データETOPO1(WGS84回転楕円体に準拠した全球1分メッシュ,
+    格子点数4億6656個:
+    <a href="https://www.ngdc.noaa.gov/mgg/global)を使用" class="uri">https://www.ngdc.noaa.gov/mgg/global)を使用</a>　
 -   オリジナルのETOPO1(ETOPO1_Bed_g\_geotiff.tif)はファイルサイズが大きいので、日本周辺域（東経115°—160°,
-    北緯25°-60°）のtifデータを使用。
+    北緯25°-60°）を抽出したtifを使用。
+
+#ETOPO1_geo \<- raster(“ETOPO1_Bed_g\_geotiff.tif”) #JPN_ext \<-
+extent(125,150,25,60) #ETOPO01_JPN_geo \<- crop(ETOPO1_geo, JPN_ext)
+#writeRaster(ETOPO01_JPN_geo, “ETOPO1_geo_JPN.tif”, overwrite=T)
 
 ``` r
 ETOPO1_geo_JPN <- raster("ETOPO1_geo_JPN.tif")
 ```
 
-# 5．深度/標高のカラーリング用関数を適用
+## 5．深度/標高のカラーリング用関数を適用
 
 ``` r
 ETOPO1_geo_JPN.br <- colbr(ETOPO1_geo_JPN)
 ```
 
-# 6．海底地形データの描写
+## 6．海底地形データの描写
 
 ``` r
 plot(ETOPO1_geo_JPN, col=c(blue.col(ETOPO1_geo_JPN.br[[1]]),terrain.colors(ETOPO1_geo_JPN.br[[2]])),breaks=ETOPO1_geo_JPN.br[[3]])
