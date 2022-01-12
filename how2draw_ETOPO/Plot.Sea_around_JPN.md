@@ -2,7 +2,7 @@
 
 ## 1．ライブラリーの読み込み
 
--   これらのRライブラリを事前にインストールしてください
+これらのRライブラリを事前にインストールしてください
 
 ``` r
 library(sp)
@@ -65,12 +65,28 @@ ETOPO1_geo_JPN <- raster("ETOPO1_geo_JPN.tif")
 ETOPO1_geo_JPN.br <- colbr(ETOPO1_geo_JPN)
 ```
 
-## 6．海底地形データの描写
+## 6．日本周辺の海底地形データの描写
 
 ``` r
 plot(ETOPO1_geo_JPN, col=c(blue.col(ETOPO1_geo_JPN.br[[1]]),terrain.colors(ETOPO1_geo_JPN.br[[2]])),breaks=ETOPO1_geo_JPN.br[[3]])
 ```
 
 ![](Plot.Sea_around_JPN_files/figure-markdown_github/unnamed-chunk-6-1.png)
+
+## おまけ．伊勢湾の海底地形データの描写
+
+このスケールだとETOPO1では粗さが目立つので、より高精度なデータ（JTOPO30:緯度経度30秒グリッド)を使いたいところです。
+
+``` r
+#伊勢湾周辺の抽出
+IseBay_ext <- extent(136.2,137.6,34.2,35.4)
+ETOPO1_geo_IseBay <- crop(ETOPO1_geo_JPN, IseBay_ext)
+#カラーリング用関数の適用
+ETOPO1_geo_IseBay.br <- colbr(ETOPO1_geo_IseBay)
+#プロット
+plot(ETOPO1_geo_IseBay,col=c(blue.col(ETOPO1_geo_IseBay.br[[1]]),terrain.colors(ETOPO1_geo_IseBay.br[[2]])),breaks=ETOPO1_geo_IseBay.br[[3]])
+```
+
+![](Plot.Sea_around_JPN_files/figure-markdown_github/unnamed-chunk-7-1.png)
 
 ------------------------------------------------------------------------
