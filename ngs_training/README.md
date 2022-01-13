@@ -41,9 +41,17 @@
 * vcftools: a set of tools for working with VCF files https://github.com/vcftools/vcftools
 
 
-### NGSツールのインストールについて
-追記予定
+### NGSツールのインストールと設定
+ここでは/home/hogehoge/localにツール類を入れることとする
 
+#### SRA-toolkit
+Ubuntu 64 bit版を本家サイトからダウンロード https://github.com/ncbi/sra-tools/wiki/01.-Downloading-SRA-Toolkit
+```
+$ cd /home/hogehoge/local
+$ wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/2.11.3/sratoolkit.2.11.3-ubuntu64.tar.gz　
+$ tar zxvf sratoolkit.2.11.3-ubuntu64.tar.gz
+```
+パスの設定も忘れずに！
 
 
 ## 参考情報
@@ -61,8 +69,8 @@
 ---
 ---
 
-## リシーケンス解析チュートリアル
-出芽酵母 *Saccharomyces* *cerevisiae* は真核生物として初めてゲノム解読されたモデル生物であり、ゲノムサイズが小さい(12.1Mb)ため、塩基配列データもコンパクトになります。そこで酵母のリシーケンスデータを用いて、変異検出までの解析処理の流れを学びます。
+## リシーケンス解析のチュートリアル
+出芽酵母 *Saccharomyces* *cerevisiae* は真核生物として初めてゲノム解読されたモデル生物です。ゲノムサイズが小さい(12.1Mb)ため、塩基配列データもコンパクトで扱いやすく、高スペックの計算機でなくても解析することができます。そこで酵母のリシーケンスデータを題材にして、公開データの取得から変異検出までの解析処理の流れを学びます。
 
 ### 1. 公開データ取得
 #### 1-1. シーケンスリードの取得
@@ -76,7 +84,7 @@ $ fastq_folder=$main_folder/fastq
 $ mkdir -p $fastq_folder
 $ cd $fastq_folder
 ```
-SRA-toolkitのfastq-dumpコマンドを使って、生リードデータを取得
+SRA-toolkitのfastq-dumpコマンドを使って、リードデータを取得
 ```
 $ fastq-dump --split-files ERR038793 #オプション--split-filesでペアエンドを２つのfastqに分割
 ```
@@ -102,7 +110,7 @@ file    format  type  num_seqs      sum_len   min_len   avg_len   max_len
 ERR038793_1.fastq   FASTQ DNA 739,873 73,987,300  100 100 100
 ```
 ```
-$ cd $main_folder
+$ cd $main_folder　#メインの作業フォルダに戻る
 ```
 
 #### 1-2. 酵母のリファレンスゲノムの取得
@@ -143,6 +151,11 @@ $ cd $main_folder
 ```
 
 ### 2. リードデータのクオリティーチェック
+
+```
+$ fastqc ERR038793_1.fastq　#fastqcを実行
+```
+FastQCの解析レポート https://github.com/akihirao/how2cook/tree/main/ngs_training/ERR038793_1_fastqc.html
 
 
 
