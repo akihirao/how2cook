@@ -2,7 +2,6 @@
 
 
 平尾　章
-HIRAO Akira
 
 水産研究・教育機構 水産資源研究所
 水産資源研究センター 漁業情報解析部　資源解析グループ
@@ -23,25 +22,25 @@ HIRAO Akira
 
 ### 資料
 
-- 解析用コードへのアクセス hhttps://github.com/akihirao/how2cook/tree/main/ngs_training
+- 解析用コードへのアクセス https://github.com/akihirao/how2cook/tree/main/ngs_training
 
 
 ### 使用するNGSツール
 
-* bedtools: a powerful toolset for genome arithmetic (https://bedtools.readthedocs.io)
-* BWA: Burrow-Wheeler Aligner (http://bio-bwa.sourceforge.net)
-* Bwa-mem2: the next version of the bwa-mem (https://github.com/bwa-mem2/bwa-mem2) 
-* fastp: an all-in-one preprocessing tool for fastq files (https://github.com/OpenGene/fastp) 
-* fastqc: a quality control tool (https://www.bioinformatics.babraham.ac.uk/projects/fastqc) 
-* GATK: Genome Analysis Toolkit (https://gatk.broadinstitute.org/)
-* Plink: whole-genome association analysis tool (https://www.cog-genomics.org/plink/)
-* samtools: tools for manipulating NGS data (https://github.com/samtools/samtools)
-* Trimmomatic: a flexible read trimming tool (https://github.com/usadellab/Trimmomatic)
-* vcftools: a set of tools for working with VCF files (https://github.com/vcftools/vcftools)
+* bedtools: a powerful toolset for genome arithmetic https://bedtools.readthedocs.io
+* BWA: Burrow-Wheeler Aligner http://bio-bwa.sourceforge.net
+* Bwa-mem2: the next version of the bwa-mem https://github.com/bwa-mem2/bwa-mem2) 
+* fastp: an all-in-one preprocessing tool for fastq files (https://github.com/OpenGene/fastp
+* fastqc: a quality control tool https://www.bioinformatics.babraham.ac.uk/projects/fastqc
+* GATK: Genome Analysis Toolkit https://gatk.broadinstitute.org
+* Plink: whole-genome association analysis tool https://www.cog-genomics.org/plink
+* samtools: tools for manipulating NGS data https://github.com/samtools/samtools
+* Trimmomatic: a flexible read trimming tool https://github.com/usadellab/Trimmomatic
+* vcftools: a set of tools for working with VCF files https://github.com/vcftools/vcftools
 
 
 ### NGSツールのインストールについて
-* ...
+...
 
 
 
