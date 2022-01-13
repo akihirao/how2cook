@@ -66,29 +66,54 @@
 
 ### 1. 公開データ取得
 #### 1-1. シーケンスリードの取得
-酵母をリシーケンスした生リードデータ(ERR038793)をDRA/SRA/ERA公共データベースからダウンロードしてみましょう。直接ブラウザからFASTQファイルをダウンロードできないので、SRA-toolkitを使います。
+酵母をリシーケンスした生リードデータ(ERR038793)をDRA/SRA/ERA公共データベースからSRA-toolkitを使ってダウンロードしてみましょう。
 
-仮にユーザーhogehogeは主な作業場所を/home/hogehoge/practices/Scerとしており、そのサブフォルダ/home/hogehoge/practices/Scer/fastqに生リードデータを保存することとします。
+たとえば、こんな感じでリードデータの保管フォルダを作っておきます。
 
 `main_folder=/home/hogehoge/practices/Scer`　
+
 `fastq_folder=$main_folder/fastq`　
+
 `mkdir -p $fastq_folder`　
+
 `cd $fastq_folder`
 
-`fastq-dump --split-files ERR038793`　#--split-files: ペアエンドを*_1.fastqと*_2.fastqに分割
-`seqkit stats　ERR038793_*.fastq` #fastqの概要の表示
+SRA-toolkitのfastq-dumpコマンドで生リードデータを取得(-split-filesオプションでペアエンドを２つのfastqに分割）
+
+`fastq-dump --split-files ERR038793`
+
+seqkitツールでfastqリードの概要チェック
+
+`seqkit stats　ERR038793_*.fastq`
+
+
+生リードの先頭部分を閲覧
+
+`head ERR038793_1.fastq`
+
+`@ERR038793.1 1 length=100
+GGACAAGGTTACTTCCTAGATGCTATATGTCCCTACGGCCTTGTCTAACACCATCCAGCATGCAATAAGGTGACATAGATATACCCACACACCACACCCT
++ERR038793.1 1 length=100
+D/DDBD@B>DFFEEEEEEEEF@FDEEEBEDBBDDD:AEEE<>CB?FCFF@F?FBFF@?:EEE:EEBEEEB=EEE.>>?=AD=8CDFFFFFEFEF@C?;DC
+@ERR038793.2 2 length=100
+TGGTGGTATAAAGTGGTAGGGTAAGTATGTGTGTATTATTTACGATCATTTGTTAGCGTTTCAATATGGTGGGTAAAAACGCAGGATAGTGAGTTACCGA`
+
 `cd $main_folder`
+
 
 #### 1-2. 酵母のリファレンスゲノムの取得
 
-リファレンスゲノムはサブフォルダ/home/hogehoge/practices/Scer/referenceに保存することとします。
+リファレンスゲノムの保存フォルダの準備
+
 `reference_folder=$main_folder/reference`
 
 `mkdir -p $reference_folder`
 
 `cd $reference_folder`
 
-`wget fastq-dump --split-files ERR038793`
+酵母リファレンスゲノムをダウンロード
+
+`wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2_R64/GCF_000146045.2_R64_genomic.fna.gz`
 
 `cd $main_folder`
 
