@@ -26,7 +26,7 @@
 
 
 
-### 使用するNGSツール
+## 使用するNGSツール
 
 * bedtools: a powerful toolset for genome arithmetic https://bedtools.readthedocs.io
 * BWA: Burrow-Wheeler Aligner http://bio-bwa.sourceforge.net
@@ -41,7 +41,7 @@
 
 
 ### NGSツールのインストールについて
-...
+追記予定
 
 
 
@@ -64,7 +64,8 @@
 出芽酵母 *Saccharomyces* *cerevisiae* は真核生物として初めてゲノム解読されたモデル生物であり、ゲノムサイズが小さい(12.1Mb)ため、塩基配列データもコンパクトになります。そこで酵母のリシーケンスデータを用いて、変異検出までの解析処理の流れを学びます。
 
 ### 1. 公開データ取得
-NGSから出力された生シーケンスデータの多くは、科学研究の再現性担保およびデータ解析による新たな発見を支えるために公共データベース（DRA/SRA/ERA)にアーカイブされています。ここでは出芽酵母のリシーケンス(ERR038793)の生リードデータをSRA-toolkitを用いてダウンロードしてみましょう。
+酵母のリシーケンスの生リードデータ [ERR038793](https://www.ncbi.nlm.nih.gov/sra/ERR038793) をSRA-toolkitを用いてダウンロードしてみましょう。
+* NGSからの出力データの多くは、公共データベース（DRA/SRA/ERA)にアーカイブされています。
 
 
 
