@@ -69,10 +69,11 @@
 酵母をリシーケンスした生リードデータ(ERR038793)をDRA/SRA/ERA公共データベースからダウンロードしてみましょう。直接ブラウザからFASTQファイルをダウンロードできないので、SRA-toolkitを使います。
 
 仮にユーザーhogehogeは主な作業場所を/home/hogehoge/practices/Scerとしており、そのサブフォルダ/home/hogehoge/practices/Scer/fastqに生リードデータを保存することとします。
-`main_folder=/home/hogehoge/practices/Scer　
-fastq_folder=$main_folder/fastq
-mkdir -p $fastq_folder
-cd $fastq_folder`
+
+`main_folder=/home/hogehoge/practices/Scer`　
+`fastq_folder=$main_folder/fastq`　
+`mkdir -p $fastq_folder`　
+`cd $fastq_folder`
 
 `fastq-dump --split-files ERR038793`　#--split-files: ペアエンドを*_1.fastqと*_2.fastqに分割
 `seqkit stats　ERR038793_*.fastq` #fastqの概要の表示
