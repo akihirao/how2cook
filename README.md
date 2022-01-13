@@ -1,6 +1,6 @@
 # お品書き
 ## 1. [NGSデータ解析講習](https://github.com/akihirao/how2cook/tree/main/ngs_training)
-####  リシーケンスデータのマッピングから変異検出など
+####  Reseqの変異検出など
 
 ## 2. [リードデータのDRAへの登録方法](https://github.com/akihirao/how2cook/tree/main/how2submit_DRA)
 ####  DRAへの他検体の登録などの覚書
