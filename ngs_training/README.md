@@ -25,8 +25,19 @@
 4.　変異検出　
 
 
+## 参考情報
+- Web
+  - [NGSハンズオン2015: ゲノムReseq、変異検出](https://www.iu.a.u-tokyo.ac.jp/~kadota/bioinfo_ngs_sokushu_2015/20150804_amelieff_20150902.pdf): (株)アメリエフ 山口昌男氏による講義資料
+  - [NGSデータから新たな知識を導出するためのデータ解析リテラシー](https://github.com/yuifu/ajacs68): 尾崎遼さんらの講義資料@AJACS68
+  - [macでインフォマティクス](https://kazumaxneo.hatenablog.com): 上坂一馬さんによるNGSツールなどの紹介
+  - [(Rで)塩基配列解析](http://www.iu.a.u-tokyo.ac.jp/~kadota/r_seq.html)
+  - [統合TV（NGS解析だけでなくDBなども）](http://togotv.dbcls.jp)
+  - [Linux標準教科書](http://www.lpi.or.jp/linuxtext/text.shtml)
+- 書籍
+  - [「入門者のLinux」(奈佐原顕郎著)](https://gendai.ismedia.jp/list/books/bluebacks/9784062579896):Linux初心者の方におすすめです 
 
-## 使用するNGSツール
+
+## 使用NGSツールのリスト
 
 * bedtools: a powerful toolset for genome arithmetic https://bedtools.readthedocs.io
 * BWA: Burrow-Wheeler Aligner http://bio-bwa.sourceforge.net
@@ -41,8 +52,8 @@
 * vcftools: a set of tools for working with VCF files https://github.com/vcftools/vcftools
 
 
-### NGSツールのインストールと設定
-ここでは/home/hogehoge/localにツール類を入れることとする
+## NGSツールのインストールと設定
+この例ではUbuntu 18.04の/home/hogehoge/localにツール類を入れることとします。
 
 #### SRA-toolkit
 Ubuntu 64 bit版を本家サイトからダウンロード https://github.com/ncbi/sra-tools/wiki/01.-Downloading-SRA-Toolkit
@@ -54,16 +65,26 @@ $ tar zxvf sratoolkit.2.11.3-ubuntu64.tar.gz
 パスの設定も忘れずに！
 
 
-## 参考情報
-- Web
-  - [NGSハンズオン2015: ゲノムReseq、変異検出](https://www.iu.a.u-tokyo.ac.jp/~kadota/bioinfo_ngs_sokushu_2015/20150804_amelieff_20150902.pdf): (株)アメリエフ 山口昌男氏による講義資料
-  - [NGSデータから新たな知識を導出するためのデータ解析リテラシー](https://github.com/yuifu/ajacs68): 尾崎遼さんらの講義資料@AJACS68
-  - [macでインフォマティクス](https://kazumaxneo.hatenablog.com): 上坂一馬さんによるNGSツールなどの紹介
-  - [(Rで)塩基配列解析](http://www.iu.a.u-tokyo.ac.jp/~kadota/r_seq.html)
-  - [統合TV（NGS解析だけでなくDBなども）](http://togotv.dbcls.jp)
-  - [Linux標準教科書](http://www.lpi.or.jp/linuxtext/text.shtml)
-- 書籍
-  - [「入門者のLinux」(奈佐原顕郎著)](https://gendai.ismedia.jp/list/books/bluebacks/9784062579896):Linux初心者の方におすすめです 
+#### fastqc
+```
+$ cd /home/hogehoge/local
+$ wget https://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.11.9.zip
+$ unzip fastqc_v0.11.9.zip
+```
+
+
+#### fastp
+```
+$ cd /home/hogehoge/local
+# download the latest build
+wget http://opengene.org/fastp/fastp
+chmod a+x ./fastp
+
+# or download specified version, i.e. fastp v0.23.1
+wget http://opengene.org/fastp/fastp.0.23.1
+mv fastp.0.23.1 fastp
+chmod a+x ./fastp
+```
 
 
 ---
@@ -150,12 +171,20 @@ ScerCer3.fa  FASTA   DNA         17  12,157,105   85,779  715,123.8  1,531,933
 $ cd $main_folder
 ```
 
-### 2. リードデータのクオリティーチェック
+### 2. リードデータのクオリティーコントロール
+#### 2-1. リードのクオリティーチェック
+NGSから出力されるリードには cutadapt アダプター配列やポリA、ポリT、低クオリティのリードが含まれている場合があります。リードのデータにそのような配列が含まれていたり、その他おかしなことがないかを確認し、必要に応じてそういった配列をFASTQファイルからアダプターを取り除く必要があります。このような操作をリードのQCと呼び、特に後者ははリードトリミングやリードフィルタリングとも呼ばれます。
 
+FASTQファイルのクオリティを確認する代表的ツールがFastQCです。FastQCでは、FASTQフィイルのQCの結果HTML形式でレポートが出力されます。
 ```
 $ fastqc ERR038793_1.fastq　#fastqcを実行
 ```
-FastQCの解析レポート https://github.com/akihirao/how2cook/tree/main/ngs_training/ERR038793_1_fastqc.html
+[上記のFastQC解析のレポート例](https://github.com/akihirao/how2cook/tree/main/ngs_training/ERR038793_1_fastqc.html)
+
+FastQCのインストール、使い方、レポートの見方 https://bi.biopapyrus.jp/rnaseq/qc/fastqc.html
+
+#### 2-2. リードのクオリティーフィルタリング
+次に低品質のリードや塩基を除去します。
 
 
 
