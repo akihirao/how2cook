@@ -71,20 +71,30 @@
 仮にユーザーhogehogeが/home/hogehoge/practices/Scerを主な作業フォルダとしており、生リードデータをサブフォルダ/home/hogehoge/practices/Scer/fastqに保存することとします。
 
 `main_folder=/home/hogehoge/practices/Scer`
+
 `fastq_folder=$main_folder/fastq`
+
 `mkdir -p $fastq_folder`
+
 `cd $fastq_folder`
+
 `fastq-dump --split-files ERR038793 #--split-files: ペアエンドを*_1.fastqと*_2.fastqに分割`
+
 `seqkit stats　ERR038793_*.fastq #fastqの概要の表示`
+
 `cd $main_folder`
 
 #### 1-2. 酵母のリファレンスゲノムの取得
 
 リファレンスゲノムはサブフォルダ/home/hogehoge/practices/Scer/referenceに保存することとします。
 `reference_folder=$main_folder/reference`
+
 `mkdir -p $reference_folder`
+
 `cd $reference_folder`
+
 `wget fastq-dump --split-files ERR038793`
+
 `cd $main_folder`
 
 ### 2. リードデータのクオリティーチェック
