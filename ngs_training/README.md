@@ -36,6 +36,7 @@
 * GATK: Genome Analysis Toolkit https://gatk.broadinstitute.org
 * Plink: whole-genome association analysis tool https://www.cog-genomics.org/plink
 * samtools: tools for manipulating NGS data https://github.com/samtools/samtools
+* seqkit: an ultrafast toolkit for FASTA/Q file manipulation https://github.com/shenwei356/seqkit
 * Trimmomatic: a flexible read trimming tool https://github.com/usadellab/Trimmomatic
 * vcftools: a set of tools for working with VCF files https://github.com/vcftools/vcftools
 
@@ -64,11 +65,24 @@
 出芽酵母 *Saccharomyces* *cerevisiae* は真核生物として初めてゲノム解読されたモデル生物であり、ゲノムサイズが小さい(12.1Mb)ため、塩基配列データもコンパクトになります。そこで酵母のリシーケンスデータを用いて、変異検出までの解析処理の流れを学びます。
 
 ### 1. 公開データ取得
-酵母をリシーケンスした生リードデータ(ERR038793)を公共データベース（DRA/SRA/ERA)からダウンロードしてみましょう。直接ブラウザからFASTQファイルをダウンロードできないので、SRA-toolkitを使います。
+#### 1. シーケンスリードの取得
+酵母をリシーケンスした生リードデータ(ERR038793)をDRA/SRA/ERA公共データベースからダウンロードしてみましょう。直接ブラウザからFASTQファイルをダウンロードできないので、SRA-toolkitを使います。
 
-`fastq-dump --split-files ERR038793`
+仮にユーザーhogehogeが/home/hogehoge/practiceで作業しており、生リードデータをサブフォルダ/home/hogehoge/practice/fastqに保存することとします。
 
-### 2. クオリティーチェック
+`$ mkdir -p RawFastq
+$ cd RawFastq
+$ fastq-dump --split-files ERR038793 #--split-files: ペアエンドを*_1.fastqと*_2.fastqに分割
+$ seqkit stats　ERR038793_*.fastq #fastqの概要の表示`
+
+
+#### 2. 酵母のリファレンスゲノムの取得
+
+リファレンスゲノムはサブフォルダ/home/hogehoge/practice/referenceに保存することとします。
+`$ fastq-dump --split-files ERR038793`
+
+
+### 2. リードデータのクオリティーチェック
 
 
 
