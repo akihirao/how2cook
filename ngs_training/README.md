@@ -53,7 +53,8 @@
 
 
 ## NGSツールのインストールと設定
-この例ではUbuntu 18.04の/home/hogehoge/localにツール類を入れることとします。
+この例では、ubuntuマシン(18.04)の/home/hogehoge/localにツール類を入れることとします。パスの設定も適宜忘れずに！
+
 
 #### SRA-toolkit
 Ubuntu 64 bit版を本家サイトからダウンロード https://github.com/ncbi/sra-tools/wiki/01.-Downloading-SRA-Toolkit
@@ -62,7 +63,6 @@ $ cd /home/hogehoge/local
 $ wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/2.11.3/sratoolkit.2.11.3-ubuntu64.tar.gz　
 $ tar zxvf sratoolkit.2.11.3-ubuntu64.tar.gz
 ```
-パスの設定も忘れずに！
 
 
 #### fastqc
@@ -77,15 +77,22 @@ $ unzip fastqc_v0.11.9.zip
 ```
 $ cd /home/hogehoge/local
 # download the latest build
-wget http://opengene.org/fastp/fastp
-chmod a+x ./fastp
+$ wget http://opengene.org/fastp/fastp
+$ chmod a+x ./fastp
 
 # or download specified version, i.e. fastp v0.23.1
-wget http://opengene.org/fastp/fastp.0.23.1
-mv fastp.0.23.1 fastp
-chmod a+x ./fastp
+$wget http://opengene.org/fastp/fastp.0.23.1
+$mv fastp.0.23.1 fastp
+$chmod a+x ./fastp
 ```
 
+
+#### BWA
+```
+$ cd /home/hogehoge/local
+$ git clone https://github.com/lh3/bwa.git
+$ cd bwa; make
+```
 
 ---
 ---
@@ -175,13 +182,27 @@ $ cd $main_folder
 #### 2-1. リードのクオリティーチェック
 NGSから出力されるリードには cutadapt アダプター配列やポリA、ポリT、低クオリティのリードが含まれている場合があります。リードのデータにそのような配列が含まれていたり、その他おかしなことがないかを確認し、必要に応じてそういった配列をFASTQファイルからアダプターを取り除く必要があります。このような操作をリードのQCと呼び、特に後者ははリードトリミングやリードフィルタリングとも呼ばれます。
 
-FASTQファイルのクオリティを確認する代表的ツールがFastQCです。FastQCでは、FASTQフィイルのQCの結果HTML形式でレポートが出力されます。
+FASTQファイルのクオリティを確認する代表的ツールがFastQCです。まずバージョンを確認してみましょう。
 ```
-$ fastqc ERR038793_1.fastq　#fastqcを実行
+$　fastqc --version
+FastQC v.0.11.9
+```
+ついでヘルプで使い方をみてみましょう。
+```
+$ fastqc --help
+  FastQC - A high throughput sequence QC analysis too
+SYNOPSIS
+fastqc seqfile1 seqfile2 .. seqfileN
+...
+```
+FastQCを実行すると、QCの結果がHTML形式でレポートが出力されます。
+```
+$ fastqc ERR038793_1.fastq　
 ```
 [上記のFastQC解析のレポート例](https://github.com/akihirao/how2cook/tree/main/ngs_training/ERR038793_1_fastqc.html)
 
 FastQCのインストール、使い方、レポートの見方 https://bi.biopapyrus.jp/rnaseq/qc/fastqc.html
+
 
 #### 2-2. リードのクオリティーフィルタリング
 次に低品質のリードや塩基を除去します。
@@ -189,6 +210,12 @@ FastQCのインストール、使い方、レポートの見方 https://bi.biopa
 
 
 ### 3. マッピング
+
+まずリファレンスのインデックスを作成します。
+```
+$ cd $reference_folder
+$ bwa index ScerCer3.fa
+```
 
 
 
