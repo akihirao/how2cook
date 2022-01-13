@@ -69,52 +69,55 @@
 酵母をリシーケンスした生リードデータ(ERR038793)をDRA/SRA/ERA公共データベースからSRA-toolkitを使ってダウンロードしてみましょう。
 
 たとえば、こんな感じでリードデータの保管フォルダを作っておきます。
+```
+main_folder=/home/hogehoge/practices/Scer
+fastq_folder=$main_folder/fastq
+mkdir -p $fastq_folder
+cd $fastq_folder
+```
+SRA-toolkitのfastq-dumpコマンドにて生リードデータを取得
+```
+fastq-dump --split-files ERR038793 #オプション--split-filesでペアエンドを２つのfastqに分割
+```
 
-`main_folder=/home/hogehoge/practices/Scer`　
-
-`fastq_folder=$main_folder/fastq`　
-
-`mkdir -p $fastq_folder`　
-
-`cd $fastq_folder`
-
-SRA-toolkitのfastq-dumpコマンドで生リードデータを取得(-split-filesオプションでペアエンドを２つのfastqに分割）
-
-`fastq-dump --split-files ERR038793`
-
-seqkitツールでfastqリードの概要チェック
-
-`seqkit stats　ERR038793_*.fastq`
-
-
-生リードの先頭部分を閲覧
-
-`head ERR038793_1.fastq`
-
-`@ERR038793.1 1 length=100
+生リードデータの確認
+```
+head ERR038793_1.fastq　#fastqの先頭部分を閲覧
+```
+```
+@ERR038793.1 1 length=100
 GGACAAGGTTACTTCCTAGATGCTATATGTCCCTACGGCCTTGTCTAACACCATCCAGCATGCAATAAGGTGACATAGATATACCCACACACCACACCCT
 +ERR038793.1 1 length=100
 D/DDBD@B>DFFEEEEEEEEF@FDEEEBEDBBDDD:AEEE<>CB?FCFF@F?FBFF@?:EEE:EEBEEEB=EEE.>>?=AD=8CDFFFFFEFEF@C?;DC
 @ERR038793.2 2 length=100
-TGGTGGTATAAAGTGGTAGGGTAAGTATGTGTGTATTATTTACGATCATTTGTTAGCGTTTCAATATGGTGGGTAAAAACGCAGGATAGTGAGTTACCGA`
-
-`cd $main_folder`
-
+TGGTGGTATAAAGTGGTAGGGTAAGTATGTGTGTATTATTTACGATCATTTGTTAGCGTTTCAATATGGTGGGTAAAAACGCAGGATAGTGAGTTACCGA
+...
+```
+```
+seqkit stats ERR038793_1.fastq　#リードデータの概要チェック
+```
+```
+file    format  type  num_seqs      sum_len   min_len   avg_len   max_len
+ERR038793_1.fastq   FASTQ DNA 739,873 73,987,300  100 100 100
+```
+```
+cd $main_folder
+```
 
 #### 1-2. 酵母のリファレンスゲノムの取得
 
 リファレンスゲノムの保存フォルダの準備
-
-`reference_folder=$main_folder/reference`
-
-`mkdir -p $reference_folder`
-
-`cd $reference_folder`
-
-酵母リファレンスゲノムをダウンロード
-
-`wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2_R64/GCF_000146045.2_R64_genomic.fna.gz`
-
+```
+reference_folder=$main_folder/reference
+mkdir -p $reference_folder
+cd $reference_folder
+```
+酵母リファレンスゲノムをダウンロードし、展開し、
+```
+wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2_R64/GCF_000146045.2_R64_genomic.fna.gz
+gzip -d GCF_000146045.2_R64_genomic.fna.gz
+mv GCF_000146045.2_R64_genomic.fna ScerCer3.fa
+```
 `cd $main_folder`
 
 ### 2. リードデータのクオリティーチェック
