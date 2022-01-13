@@ -65,22 +65,27 @@
 出芽酵母 *Saccharomyces* *cerevisiae* は真核生物として初めてゲノム解読されたモデル生物であり、ゲノムサイズが小さい(12.1Mb)ため、塩基配列データもコンパクトになります。そこで酵母のリシーケンスデータを用いて、変異検出までの解析処理の流れを学びます。
 
 ### 1. 公開データ取得
-#### 1. シーケンスリードの取得
+#### 1-1. シーケンスリードの取得
 酵母をリシーケンスした生リードデータ(ERR038793)をDRA/SRA/ERA公共データベースからダウンロードしてみましょう。直接ブラウザからFASTQファイルをダウンロードできないので、SRA-toolkitを使います。
 
-仮にユーザーhogehogeが/home/hogehoge/practiceで作業しており、生リードデータをサブフォルダ/home/hogehoge/practice/fastqに保存することとします。
+仮にユーザーhogehogeが/home/hogehoge/practices/Scerを主な作業フォルダとしており、生リードデータをサブフォルダ/home/hogehoge/practices/Scer/fastqに保存することとします。
 
-`$ mkdir -p RawFastq
-$ cd RawFastq
-$ fastq-dump --split-files ERR038793 #--split-files: ペアエンドを*_1.fastqと*_2.fastqに分割
-$ seqkit stats　ERR038793_*.fastq #fastqの概要の表示`
+`main_folder=/home/hogehoge/practices/Scer`
+`fastq_folder=$main_folder/fastq`
+`mkdir -p $fastq_folder`
+`cd $fastq_folder`
+`fastq-dump --split-files ERR038793 #--split-files: ペアエンドを*_1.fastqと*_2.fastqに分割`
+`seqkit stats　ERR038793_*.fastq #fastqの概要の表示`
+`cd $main_folder`
 
+#### 1-2. 酵母のリファレンスゲノムの取得
 
-#### 2. 酵母のリファレンスゲノムの取得
-
-リファレンスゲノムはサブフォルダ/home/hogehoge/practice/referenceに保存することとします。
-`$ fastq-dump --split-files ERR038793`
-
+リファレンスゲノムはサブフォルダ/home/hogehoge/practices/Scer/referenceに保存することとします。
+`reference_folder=$main_folder/reference`
+`mkdir -p $reference_folder`
+`cd $reference_folder`
+`wget fastq-dump --split-files ERR038793`
+`cd $main_folder`
 
 ### 2. リードデータのクオリティーチェック
 
