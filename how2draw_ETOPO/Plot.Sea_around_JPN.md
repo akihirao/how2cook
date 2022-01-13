@@ -15,7 +15,7 @@ library(ggplot2)
 library(reshape2)
 ```
 
-## 2．深度・標高のカラーリング用関数の定義
+## 2．海底深度・標高のカラーリング用関数の定義
 
 参照サイト(<https://www.benjaminbell.co.uk/2019/08/bathymetric-maps-in-r-colour-palettes.html>)
 
@@ -39,7 +39,7 @@ colbr <- function(x, b1=50, b2=50, r1=-2, r2=-2) {
 }
 ```
 
-## 3．海域/陸域のカラーパレットの定義
+## 3．海域・陸域のカラーパレットの定義
 
 ``` r
 blue.col <- colorRampPalette(c("darkblue", "lightblue"))
@@ -59,7 +59,7 @@ blue.col <- colorRampPalette(c("darkblue", "lightblue"))
 ETOPO1_geo_JPN <- raster("ETOPO1_geo_JPN.tif")
 ```
 
-## 5．深度/標高のカラーリング用関数を適用
+## 5．海底深度・標高のカラーリング用関数の適用
 
 ``` r
 ETOPO1_geo_JPN.br <- colbr(ETOPO1_geo_JPN)
@@ -73,9 +73,9 @@ plot(ETOPO1_geo_JPN, col=c(blue.col(ETOPO1_geo_JPN.br[[1]]),terrain.colors(ETOPO
 
 ![](Plot.Sea_around_JPN_files/figure-markdown_github/unnamed-chunk-6-1.png)
 
-## 7. おまけ:伊勢湾の海底地形データの描写
+## 7. おまけ: 伊勢湾の海底地形データの描写
 
-このスケールだとETOPO1では粗さが目立つので、より高精度なデータ（JTOPO30:緯度経度30秒グリッドなど)に置き換えるとよいです。
+このスケールだとETOPO1では粗さが目立つので、より高精度なデータ（JTOPO30など)に置き換えるとよいです。
 
 ``` r
 #伊勢湾周辺の抽出
