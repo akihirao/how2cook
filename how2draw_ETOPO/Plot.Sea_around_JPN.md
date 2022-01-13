@@ -73,9 +73,9 @@ plot(ETOPO1_geo_JPN, col=c(blue.col(ETOPO1_geo_JPN.br[[1]]),terrain.colors(ETOPO
 
 ![](Plot.Sea_around_JPN_files/figure-markdown_github/unnamed-chunk-6-1.png)
 
-## おまけ．伊勢湾の海底地形データの描写
+## 7. おまけ:伊勢湾の海底地形データの描写
 
-このスケールだとETOPO1では粗さが目立つので、より高精度なデータ（JTOPO30:緯度経度30秒グリッド)を使いたいところです。
+このスケールだとETOPO1では粗さが目立つので、より高精度なデータ（JTOPO30:緯度経度30秒グリッドなど)に置き換えるとよいです。
 
 ``` r
 #伊勢湾周辺の抽出
