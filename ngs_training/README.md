@@ -14,16 +14,6 @@
 初心者向けのチュートリアルとして、酵母 *Saccharomyces* *cerevisiae* のリシーケンス解析を題材に公開データの取得から変異検出までの解析手順の流れを学びます。 
 
 
-## 本チュートリアルの流れ
-
-1.　[公開データ取得](#公開データ取得)
-
-2.　[クオリティーコントロール](#リードデータのクオリティーコントロール)
-
-3.　マッピング
-
-4.　変異検出　
-
 
 ## 参考情報
 - Web
@@ -35,6 +25,152 @@
   - [Linux標準教科書](http://www.lpi.or.jp/linuxtext/text.shtml)
 - 書籍
   - [「入門者のLinux」(奈佐原顕郎著)](https://gendai.ismedia.jp/list/books/bluebacks/9784062579896):Linux初心者の方におすすめです 
+
+
+
+---
+---
+
+# リシーケンス解析のチュートリアル
+出芽酵母 *Saccharomyces* *cerevisiae* は真核生物として初めてゲノム解読されたモデル生物です。ゲノムサイズが小さい(12.1Mb)ため、塩基配列データもコンパクトで扱いやすく、高スペックの計算機でなくても解析することができます。そこで酵母のリシーケンスデータを題材にして、公開データの取得から変異検出までの解析処理の流れを学びます。解析環境はUbuntuで、使用NGSツールのリストが全てインストール済みであることを想定しています。
+
+# 0. 本チュートリアルの流れ
+
+[1.公開データ取得](#1.公開データ取得)
+
+[2.クオリティーコントロール](#1.公開データ取得)
+
+3.　マッピング
+
+4.　変異検出　
+
+
+# 1.公開データ取得
+#### 1-1. シーケンスリードの取得
+酵母をリシーケンスした生リードデータ(ERR038793)をDRA/SRA/ERA公共データベースからSRA-toolkitを使ってダウンロードしてみましょう。
+
+たとえば、こんな感じで作業フォルダおよびリードデータの保管フォルダを作っておきます。
+```
+$ user_name=hogehoge #アカウント名:hogehogeの場合
+$ main_folder=/home/$user_name/work/Scer
+$ fastq_folder=$main_folder/fastq
+$ mkdir -p $fastq_folder
+$ cd $fastq_folder
+```
+SRA-toolkitのfastq-dumpコマンドを使って、リードデータを取得
+```
+$ fastq-dump --split-files ERR038793 #オプション--split-filesでペアエンドのSRAデータを２つのfastqに分割
+```
+
+リードデータの中身確認
+```
+$ head ERR038793_1.fastq　#fastqの先頭部分を閲覧
+```
+```
+@ERR038793.1 1 length=100
+GGACAAGGTTACTTCCTAGATGCTATATGTCCCTACGGCCTTGTCTAACACCATCCAGCATGCAATAAGGTGACATAGATATACCCACACACCACACCCT
++ERR038793.1 1 length=100
+D/DDBD@B>DFFEEEEEEEEF@FDEEEBEDBBDDD:AEEE<>CB?FCFF@F?FBFF@?:EEE:EEBEEEB=EEE.>>?=AD=8CDFFFFFEFEF@C?;DC
+@ERR038793.2 2 length=100
+TGGTGGTATAAAGTGGTAGGGTAAGTATGTGTGTATTATTTACGATCATTTGTTAGCGTTTCAATATGGTGGGTAAAAACGCAGGATAGTGAGTTACCGA
+...
+```
+リードデータの概要をseqkit(fastq/fastaの操作ツール)で確認
+```
+$ seqkit stats ERR038793_1.fastq
+```
+```
+file    format  type  num_seqs      sum_len   min_len   avg_len   max_len
+ERR038793_1.fastq   FASTQ DNA 739,873 73,987,300  100 100 100
+```
+```
+$ cd $main_folder　#メインの作業フォルダに戻る
+```
+
+#### 1-2. 酵母のリファレンスゲノムの取得
+
+リファレンスゲノムの保存フォルダの準備
+```
+$ reference_folder=$main_folder/reference
+$ mkdir -p $reference_folder
+$ cd $reference_folder
+```
+酵母リファレンスゲノムを取得
+```
+$ wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2_R64/GCF_000146045.2_R64_genomic.fna.gz
+$ gzip -d GCF_000146045.2_R64_genomic.fna.gz　#gzを展開
+$ mv GCF_000146045.2_R64_genomic.fna ScerCer3.fa #コンパクトな名前に変更
+```
+リファレンスゲノムの中身確認
+```
+$ head ERR038793_1.fastq　#fastqの先頭部分を閲覧
+```
+```
+>NC_001133.9 Saccharomyces cerevisiae S288C chromosome I, complete sequence
+ccacaccacacccacacacccacacaccacaccacacaccacaccacacccacacacacacatCCTAACACTACCCTAAC
+ACAGCCCTAATCTAACCCTGGCCAACCTGTCTCTCAACTTACCCTCCATTACCCTGCCTCCACTCGTTACCCTGTCCCAT
+TCAACCATACCACTCCGAACCACCATCCATCCCTCTACTTACTACCACTCACCCACCGTTACCCTCCAATTACCCATATC
+CAACCCACTGCCACTTACCCTACCATTACCCTACCATCCACCATGACCTACTCACCATACTGTTCTTCTACCCACCATAT
+...
+```
+```
+$ seqkit stats ScerCer3.fa　#リファレンスゲノムの概要チェック
+```
+```
+file         format  type  num_seqs     sum_len  min_len    avg_len    max_len
+ScerCer3.fa  FASTA   DNA         17  12,157,105   85,779  715,123.8  1,531,933
+```
+```
+$ cd $main_folder
+```
+
+### 2. リードデータのクオリティーコントロール
+#### 2-1. リードのクオリティーチェック
+NGSから出力されるリードには cutadapt アダプター配列やポリA、ポリT、低クオリティのリードが含まれている場合があります。リードのデータにそのような配列が含まれていたり、その他おかしなことがないかを確認し、必要に応じてそういった配列をFASTQファイルからアダプターを取り除く必要があります。このような操作をリードのQCと呼び、特に後者ははリードトリミングやリードフィルタリングとも呼ばれます。
+
+FASTQファイルのクオリティを確認する代表的ツールがFastQCです。まずバージョンを確認してみましょう。
+```
+$　fastqc --version
+FastQC v.0.11.9
+```
+またヘルプで使い方をみてみましょう。
+```
+$ fastqc --help
+  FastQC - A high throughput sequence QC analysis too
+SYNOPSIS
+fastqc seqfile1 seqfile2 .. seqfileN
+...
+```
+FastQCを実行すると、QCの結果がHTML形式でレポートが出力されます。
+```
+$ fastqc ERR038793_1.fastq　
+```
+[上記のFastQC解析のレポート例](https://github.com/akihirao/how2cook/tree/main/ngs_training/ERR038793_1_fastqc.html)
+
+FastQCのインストール、使い方、レポートの見方 https://bi.biopapyrus.jp/rnaseq/qc/fastqc.html
+
+
+#### 2-2. リードのクオリティーフィルタリング
+次に低品質のリードや塩基を除去します。
+
+
+
+### 3. マッピング
+
+まずリファレンスのインデックスを作成します。
+```
+$ cd $reference_folder
+$ bwa index ScerCer3.fa
+```
+
+
+
+### 4. 変異検出
+
+
+
+---
+---
 
 
 ## 使用NGSツールのリスト
@@ -93,130 +229,3 @@ $ cd /home/hogehoge/local
 $ git clone https://github.com/lh3/bwa.git
 $ cd bwa; make
 ```
-
----
----
-
-## リシーケンス解析のチュートリアル
-出芽酵母 *Saccharomyces* *cerevisiae* は真核生物として初めてゲノム解読されたモデル生物です。ゲノムサイズが小さい(12.1Mb)ため、塩基配列データもコンパクトで扱いやすく、高スペックの計算機でなくても解析することができます。そこで酵母のリシーケンスデータを題材にして、公開データの取得から変異検出までの解析処理の流れを学びます。
-
-公開データ取得
-#### シーケンスリードの取得
-酵母をリシーケンスした生リードデータ(ERR038793)をDRA/SRA/ERA公共データベースからSRA-toolkitを使ってダウンロードしてみましょう。
-
-たとえば、こんな感じで作業フォルダおよびリードデータの保管フォルダを作っておきます。
-```
-$ user_name=hogehoge #アカウント名:hogehoge
-$ main_folder=/home/$user_name/work/Scer
-$ fastq_folder=$main_folder/fastq
-$ mkdir -p $fastq_folder
-$ cd $fastq_folder
-```
-SRA-toolkitのfastq-dumpコマンドを使って、リードデータを取得
-```
-$ fastq-dump --split-files ERR038793 #オプション--split-filesでペアエンドを２つのfastqに分割
-```
-
-リードデータの中身確認
-```
-$ head ERR038793_1.fastq　#fastqの先頭部分を閲覧
-```
-```
-@ERR038793.1 1 length=100
-GGACAAGGTTACTTCCTAGATGCTATATGTCCCTACGGCCTTGTCTAACACCATCCAGCATGCAATAAGGTGACATAGATATACCCACACACCACACCCT
-+ERR038793.1 1 length=100
-D/DDBD@B>DFFEEEEEEEEF@FDEEEBEDBBDDD:AEEE<>CB?FCFF@F?FBFF@?:EEE:EEBEEEB=EEE.>>?=AD=8CDFFFFFEFEF@C?;DC
-@ERR038793.2 2 length=100
-TGGTGGTATAAAGTGGTAGGGTAAGTATGTGTGTATTATTTACGATCATTTGTTAGCGTTTCAATATGGTGGGTAAAAACGCAGGATAGTGAGTTACCGA
-...
-```
-```
-$ seqkit stats ERR038793_1.fastq　#リードデータの概要チェック
-```
-```
-file    format  type  num_seqs      sum_len   min_len   avg_len   max_len
-ERR038793_1.fastq   FASTQ DNA 739,873 73,987,300  100 100 100
-```
-```
-$ cd $main_folder　#メインの作業フォルダに戻る
-```
-
-#### 酵母のリファレンスゲノムの取得
-
-リファレンスゲノムの保存フォルダの準備
-```
-$ reference_folder=$main_folder/reference
-$ mkdir -p $reference_folder
-$ cd $reference_folder
-```
-酵母リファレンスゲノムを取得
-```
-$ wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2_R64/GCF_000146045.2_R64_genomic.fna.gz
-$ gzip -d GCF_000146045.2_R64_genomic.fna.gz　#gzを展開
-$ mv GCF_000146045.2_R64_genomic.fna ScerCer3.fa #コンパクトな名前に変更
-```
-リファレンスゲノムの中身確認
-```
-$ head ERR038793_1.fastq　#fastqの先頭部分を閲覧
-```
-```
->NC_001133.9 Saccharomyces cerevisiae S288C chromosome I, complete sequence
-ccacaccacacccacacacccacacaccacaccacacaccacaccacacccacacacacacatCCTAACACTACCCTAAC
-ACAGCCCTAATCTAACCCTGGCCAACCTGTCTCTCAACTTACCCTCCATTACCCTGCCTCCACTCGTTACCCTGTCCCAT
-TCAACCATACCACTCCGAACCACCATCCATCCCTCTACTTACTACCACTCACCCACCGTTACCCTCCAATTACCCATATC
-CAACCCACTGCCACTTACCCTACCATTACCCTACCATCCACCATGACCTACTCACCATACTGTTCTTCTACCCACCATAT
-...
-```
-```
-$ seqkit stats ScerCer3.fa　#リファレンスゲノムの概要チェック
-```
-```
-file         format  type  num_seqs     sum_len  min_len    avg_len    max_len
-ScerCer3.fa  FASTA   DNA         17  12,157,105   85,779  715,123.8  1,531,933
-```
-```
-$ cd $main_folder
-```
-
-### 2. リードデータのクオリティーコントロール
-#### 2-1. リードのクオリティーチェック
-NGSから出力されるリードには cutadapt アダプター配列やポリA、ポリT、低クオリティのリードが含まれている場合があります。リードのデータにそのような配列が含まれていたり、その他おかしなことがないかを確認し、必要に応じてそういった配列をFASTQファイルからアダプターを取り除く必要があります。このような操作をリードのQCと呼び、特に後者ははリードトリミングやリードフィルタリングとも呼ばれます。
-
-FASTQファイルのクオリティを確認する代表的ツールがFastQCです。まずバージョンを確認してみましょう。
-```
-$　fastqc --version
-FastQC v.0.11.9
-```
-ついでヘルプで使い方をみてみましょう。
-```
-$ fastqc --help
-  FastQC - A high throughput sequence QC analysis too
-SYNOPSIS
-fastqc seqfile1 seqfile2 .. seqfileN
-...
-```
-FastQCを実行すると、QCの結果がHTML形式でレポートが出力されます。
-```
-$ fastqc ERR038793_1.fastq　
-```
-[上記のFastQC解析のレポート例](https://github.com/akihirao/how2cook/tree/main/ngs_training/ERR038793_1_fastqc.html)
-
-FastQCのインストール、使い方、レポートの見方 https://bi.biopapyrus.jp/rnaseq/qc/fastqc.html
-
-
-#### 2-2. リードのクオリティーフィルタリング
-次に低品質のリードや塩基を除去します。
-
-
-
-### 3. マッピング
-
-まずリファレンスのインデックスを作成します。
-```
-$ cd $reference_folder
-$ bwa index ScerCer3.fa
-```
-
-
-
-### 4. 変異検出
