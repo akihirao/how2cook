@@ -429,14 +429,14 @@ IGVの使い方について　https://bi.biopapyrus.jp/rnaseq/mapping/igv/
 <h2 id="使用NGSツールのリスト">使用NGSツールのリスト</h2>
 
 * bedtools: a powerful toolset for genome arithmetic https://bedtools.readthedocs.io
-* BWA: Burrow-Wheeler Aligner http://bio-bwa.sourceforge.net
+* BWA*: Burrow-Wheeler Aligner http://bio-bwa.sourceforge.net
 * Bwa-mem2: the next version of the bwa-mem https://github.com/bwa-mem2/bwa-mem2)
-* fastp: an all-in-one preprocessing tool for fastq files (https://github.com/OpenGene/fastp
-* fastqc: a quality control tool https://www.bioinformatics.babraham.ac.uk/projects/fastqc
-* GATK: Genome Analysis Toolkit https://gatk.broadinstitute.org
+* fastp*: an all-in-one preprocessing tool for fastq files (https://github.com/OpenGene/fastp
+* fastqc*: a quality control tool https://www.bioinformatics.babraham.ac.uk/projects/fastqc
+* GATK*: Genome Analysis Toolkit https://gatk.broadinstitute.org
 * Plink: whole-genome association analysis tool https://www.cog-genomics.org/plink
-* samtools: tools for manipulating NGS data https://github.com/samtools/samtools
-* seqkit: an ultrafast toolkit for FASTA/Q file manipulation https://github.com/shenwei356/seqkit
+* samtools*: tools for manipulating NGS data https://github.com/samtools/samtools
+* seqkit*: an ultrafast toolkit for FASTA/Q file manipulation https://github.com/shenwei356/seqkit
 * Trimmomatic: a flexible read trimming tool https://github.com/usadellab/Trimmomatic
 * vcftools: a set of tools for working with VCF files https://github.com/vcftools/vcftools
 
