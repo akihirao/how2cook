@@ -40,9 +40,9 @@
 
 2. [リードのクオリティーコントロール](#リードのクオリティーコントロール)
 
-3.　マッピング
+3.　[マッピング](#マッピング)
 
-4.　変異検出　
+4.　[変異検出](#変異検出)
 
 
 <h2 id="公開データ取得">1.&nbsp;公開データ取得</h2>
@@ -126,10 +126,10 @@ ScerCer3.fa  FASTA   DNA         17  12,157,105   85,779  715,123.8  1,531,933
 $ cd $main_folder
 ```
 
-<h2 id="リードのクオリティーコントロール">2. リードのクオリティーコントロール</h2>
+<h2 id="リードのクオリティーコントロール">2.&nbsp;リードのクオリティーコントロール</h2>
 
-## 2. # リードのクオリティーコントロール
 #### 2-1. リードのクオリティーチェック
+
 NGSから出力されるリードには cutadapt アダプター配列やポリA、ポリT、低クオリティのリードが含まれている場合があります。リードのデータにそのような配列が含まれていたり、その他おかしなことがないかを確認し、必要に応じてそういった配列をFASTQファイルからアダプターを取り除く必要があります。このような操作をリードのQCと呼び、特に後者ははリードトリミングやリードフィルタリングとも呼ばれます。
 
 FASTQファイルのクオリティを確認する代表的ツールがFastQCです。まずバージョンを確認してみましょう。
@@ -151,25 +151,29 @@ $ fastqc ERR038793_1.fastq　
 ```
 [上記のFastQC解析のレポート例](https://github.com/akihirao/how2cook/tree/main/ngs_training/ERR038793_1_fastqc.html)
 
-FastQCのインストール、使い方、レポートの見方 https://bi.biopapyrus.jp/rnaseq/qc/fastqc.html
+FastQCのインストール、使い方、レポートの見方について https://bi.biopapyrus.jp/rnaseq/qc/fastqc.html
 
 
 #### 2-2. リードのクオリティーフィルタリング
 次に低品質のリードや塩基を除去します。
 
 
-
-### 3. マッピング
+<h2 id="マッピング">3.&nbsp;マッピング</h2>
 
 まずリファレンスのインデックスを作成します。
 ```
 $ cd $reference_folder
 $ bwa index ScerCer3.fa
+[bwa_index] Pack FASTA... 0.07 sec
+[bwa_index] Construct BWT for the packed sequence...
+...
+[main] CMD: bwa index ScerCer3.fa
+[main] Real time: 5.287 sec; CPU: 5.239 sec
 ```
 
 
 
-### 4. 変異検出
+<h2 id="変異検出">4.&nbsp;変異検出</h2>
 
 
 
