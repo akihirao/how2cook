@@ -54,20 +54,20 @@
 
 まず、こんな感じで作業フォルダおよびリードデータの保管フォルダを作っておきます。
 ```
-$ user_name=hogehoge #アカウント名:hogehogeの場合
-$ main_folder=/home/$user_name/work/Scer
-$ fastq_folder=$main_folder/fastq
-$ mkdir -p $fastq_folder
-$ cd $fastq_folder
+user_name=hogehoge #アカウント名:hogehogeの場合
+main_folder=/home/$user_name/work/Scer
+fastq_folder=$main_folder/fastq
+mkdir -p $fastq_folder
+cd $fastq_folder
 ```
 今回はSRA-toolkitのfastq-dumpコマンドを使って、生リードデータ [ERR038793](https://www.ncbi.nlm.nih.gov/sra/ERR038793) をDRA/SRA/ERAデータベースからダウンロードしてみます。DRA/SRA/ERAデータベースには、科学研究の再現性担保およびデータ解析による新たな発見を支えるために、NGSから出力されたリードデータがアーカイブされています。
 ```
-$ fastq-dump --split-files ERR038793 #オプション--split-filesでペアエンドのSRAデータを２つのfastqに分割
+fastq-dump --split-files ERR038793 #オプション--split-filesでペアエンドのSRAデータを２つのfastqに分割
 ```
 
 リードデータの中身確認
 ```
-$ head ERR038793_1.fastq　#fastqの先頭部分を閲覧
+head ERR038793_1.fastq　#fastqの先頭部分を閲覧
 ```
 ```
 @ERR038793.1 1 length=100
@@ -80,7 +80,7 @@ TGGTGGTATAAAGTGGTAGGGTAAGTATGTGTGTATTATTTACGATCATTTGTTAGCGTTTCAATATGGTGGGTAAAAAC
 ```
 リードデータの概要を確認　
 ```
-$ seqkit stats ERR038793_1.fastq　#seqkitはfasta/fastq操作ツール
+seqkit stats ERR038793_1.fastq　#seqkitはfasta/fastq操作ツール
 ```
 ```
 file    format  type  num_seqs      sum_len   min_len   avg_len   max_len
@@ -88,44 +88,42 @@ ERR038793_1.fastq   FASTQ DNA 739,873 73,987,300  100 100 100
 ```
 ペアエンド１のリード数は739,873個、計73,987,300bp。
 ```
-$ cd $main_folder　#メインの作業フォルダに戻る
+cd $main_folder　#メインの作業フォルダに戻る
 ```
 
 #### 1-2. 酵母のリファレンスゲノムの取得
 
 リファレンスゲノムの保存フォルダの準備
 ```
-$ reference_folder=$main_folder/reference
-$ mkdir -p $reference_folder
-$ cd $reference_folder
+reference_folder=$main_folder/reference
+mkdir -p $reference_folder
+cd $reference_folder
 ```
 酵母リファレンスゲノムを取得
 ```
-$ wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2_R64/GCF_000146045.2_R64_genomic.fna.gz
-$ gzip -d GCF_000146045.2_R64_genomic.fna.gz　#gzを展開
-$ mv GCF_000146045.2_R64_genomic.fna ScerCer3.fa #コンパクトな名前に変更
+wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2_R64/GCF_000146045.2_R64_genomic.fna.gz
+gzip -d GCF_000146045.2_R64_genomic.fna.gz　#gzを展開
+mv GCF_000146045.2_R64_genomic.fna ScerCer3.fa #コンパクトな名前に変更
 ```
 リファレンスゲノムの中身確認
 ```
-$ head ERR038793_1.fastq　#fastqの先頭部分を閲覧
+head ERR038793_1.fastq　#fastqの先頭部分を閲覧
 ```
 ```
 >NC_001133.9 Saccharomyces cerevisiae S288C chromosome I, complete sequence
 ccacaccacacccacacacccacacaccacaccacacaccacaccacacccacacacacacatCCTAACACTACCCTAAC
 ACAGCCCTAATCTAACCCTGGCCAACCTGTCTCTCAACTTACCCTCCATTACCCTGCCTCCACTCGTTACCCTGTCCCAT
-TCAACCATACCACTCCGAACCACCATCCATCCCTCTACTTACTACCACTCACCCACCGTTACCCTCCAATTACCCATATC
-CAACCCACTGCCACTTACCCTACCATTACCCTACCATCCACCATGACCTACTCACCATACTGTTCTTCTACCCACCATAT
-...
+..
 ```
 ```
-$ seqkit stats ScerCer3.fa　#リファレンスゲノムの概要チェック
+seqkit stats ScerCer3.fa　#リファレンスゲノムの概要チェック
 ```
 ```
 file         format  type  num_seqs     sum_len  min_len    avg_len    max_len
 ScerCer3.fa  FASTA   DNA         17  12,157,105   85,779  715,123.8  1,531,933
 ```
 ```
-$ cd $main_folder
+cd $main_folder
 ```
 
 <h2 id="リードのクオリティーコントロール">2.&nbsp;リードのクオリティーコントロール</h2>
@@ -136,14 +134,14 @@ NGSから出力されるリードにはアダプター配列や低品質のリ�
 
 FASTQファイルのクオリティを確認する代表的ツールがFastQCです。まずFastQCのバージョンを確認してみましょう。
 ```
-$　fastqc --version
+fastqc --version
 ```
 ```
 FastQC v.0.11.9
 ```
 またヘルプで使い方をみてみましょう。
 ```
-$ fastqc --help
+fastqc --help
 ```
 ```
   FastQC - A high throughput sequence QC analysis too
@@ -153,7 +151,7 @@ fastqc seqfile1 seqfile2 .. seqfileN
 ```
 FastQCを実行すると、QCの結果がHTML形式でレポートが出力されます。
 ```
-$ fastqc ERR038793_1.fastq　
+fastqc ERR038793_1.fastq　
 ```
 [上記のFastQC解析のレポート例](https://github.com/akihirao/how2cook/tree/main/ngs_training/ERR038793_1_fastqc.html)
 
@@ -167,9 +165,9 @@ FastQCのインストール、使い方、レポートの見方について http
 fastpの使い方などについて　https://kazumaxneo.hatenablog.com/entry/2018/05/21/111947
 
 ```
-$ no_threads=3 #計算機環境に応じてスレッド数を指定
-$ cd $fastq_folder
-$ fastp -i ERR038793_1.fastq -I ERR038793_2.fastq -o ERR038793_1.trimmed.fastq -O ERR038793_2.trimmed.fastq -q 30 -l 40 -w $no_threads -h ERR038793.fastp.report.html
+no_threads=3 #計算機環境に応じてスレッド数を指定
+cd $fastq_folder
+fastp -i ERR038793_1.fastq -I ERR038793_2.fastq -o ERR038793_1.trimmed.fastq -O ERR038793_2.trimmed.fastq -q 30 -l 40 -w $no_threads -h ERR038793.fastp.report.html
 ```
 ```
 Read1 before filtering:
@@ -191,8 +189,8 @@ fastp処理が完了すると、フィルタリング前後の結果がHTML形�
 
 まずリファレンス (参照配列) に対してインデックス（索引）を作成します。参照配列への高速な検索を図るために事前に索引を作るといった作業です。
 ```
-$ cd $reference_folder
-$ bwa index ScerCer3.fa
+cd $reference_folder
+bwa index ScerCer3.fa
 ```
 ```
 [bwa_index] Pack FASTA... 0.07 sec
@@ -207,13 +205,13 @@ $ bwa index ScerCer3.fa
 
 マッピングの出力用フォルダを作成しておきます。
 ```
-$ bwa_out_folder=$main_folder/bwa_out
-$ mkdir -p $bwa_out_folder
-$ cd $bwa_out_folder
+bwa_out_folder=$main_folder/bwa_out
+mkdir -p $bwa_out_folder
+cd $bwa_out_folder
 ```
 Bwa memコマンドの使い方を確認しましょう。
 ```
-$ bwa mem
+bwa mem
 
 Usage: bwa mem [options] <idxbase> <in1.fq> [in2.fq]
 ...
@@ -223,11 +221,11 @@ Bwa memコマンドにてマッピングを実行します
 * gatk解析のためにオプション-Rでリードグループ(@RG)を指定しておきます。IDはその名のとおりID、SMはサンプル名、PLはシーケンスのプラットフォームに対応させます。gatkによる解説は[こちら](https://gatk.broadinstitute.org/hc/en-us/articles/360035890671-Read-groups)
 
 ```
-$ bwa mem -t $no_threads -R "@RG\tID:ERR038793\tSM:ERR038793\tPL:Illumina" $reference_folder/ScerCer3.fa $fastq_folder/ERR038793_1.trimmed.fastq $fastq_folder/ERR038793_2.trimmed.fastq > ERR038793.sam
+bwa mem -t $no_threads -R "@RG\tID:ERR038793\tSM:ERR038793\tPL:Illumina" $reference_folder/ScerCer3.fa $fastq_folder/ERR038793_1.trimmed.fastq $fastq_folder/ERR038793_2.trimmed.fastq > ERR038793.sam
 ```
 マッピングで出力されたsam形式ファイルの中身確認
 ```
-$ less ERR038793.sam
+less ERR038793.sam
 ```
 sam形式ファイルはテキストで記述されており、ヘッダーのメタ情報に続いて、１行毎に各リードのアライメント（どこにマッピングされて、ミスマッチはいくつあったかなど）が記載されています。
 ```
@@ -246,25 +244,25 @@ sam形式の解説　https://bi.biopapyrus.jp/format/sam.html
 
 samtoolsを使って、sam形式からバイナリーのbam形式に変換します。
 ```
-$ samtools view -@ $no_threads -Sb ERR038793.sam > ERR038793.bam
+samtools view -@ $no_threads -Sb ERR038793.sam > ERR038793.bam
 ```
 
 次いでbamをソートします。
 ```
-$ samtools sort -@ $no_threads ERR038793.bam > ERR038793.sorted.bam
+samtools sort -@ $no_threads ERR038793.bam > ERR038793.sorted.bam
 ```
 なお中間生成ファイルによるストレージの圧迫を避けるならば、次のようにパイプを使って bwa mem から samtools sort までの処理を一度におこなってもよいでしょう。
 ```
-$ bwa mem -t $no_threads -R "@RG\tID:ERR038793\tSM:ERR038793\tPL:Illumina" $reference_folder/ScerCer3.fa $fastq_folder/ERR038793_1.trimmed.fastq $fastq_folder/ERR038793_2.trimmed.fastq | samtools view -@ $no_threads -Sb | samtools sort -@ $no_threads > ERR038793.sorted.bam
+#bwa mem -t $no_threads -R "@RG\tID:ERR038793\tSM:ERR038793\tPL:Illumina" $reference_folder/ScerCer3.fa $fastq_folder/ERR038793_1.trimmed.fastq $fastq_folder/ERR038793_2.trimmed.fastq | samtools view -@ $no_threads -Sb | samtools sort -@ $no_threads > ERR038793.sorted.bam
 ```
 出来上がった bam ファイルにはインデックスをつけておきます。
 ```
-$ samtools index ERR038793.sorted.bam
+samtools index ERR038793.sorted.bam
 
 ```
 bamtoolsを使って、マッピングの概要を確認します。
 ```
-$ bamtools stats -in ERR038793.sorted.bam
+bamtools stats -in ERR038793.sorted.bam
 ```
 ```
 **********************************************
@@ -293,13 +291,13 @@ Singletons:        2260	(0.179572%)
 
 まずリファレンス配列に対してGATK用のインデックスを作成しておきましょう。
 ```
-$ samtools faidx $reference_folder/ScerCer3.fa
-$ gatk CreateSequenceDictionary -R $reference_folder/ScerCer3.fa -O $reference_folder/ScerCer3.dict
+samtools faidx $reference_folder/ScerCer3.fa
+gatk CreateSequenceDictionary -R $reference_folder/ScerCer3.fa -O $reference_folder/ScerCer3.dict
 ```
 またvcf形式ファイルの出力用フォルダを作っておきます。
 ```
-$ vcf_out_folder=$main_folder/vcf_out
-$ mkdir -p $vcf_out_folder
+vcf_out_folder=$main_folder/vcf_out
+mkdir -p $vcf_out_folder
 ```
 
 #### 4-1. 前処理
@@ -307,18 +305,18 @@ $ mkdir -p $vcf_out_folder
 シーケンスライブラリーの作成にPCRを使っている場合、マッピングされたリードの中に PCR duplication に由来する重複リードが含まれている可能性がある。このような重複リードはバリアントコールに偽陽性をもたらす可能性があるために、目印をつけておき、ダウンストリーム解析で除去できるようにしておきます。なおゲノム縮約シーケンス（RAD-SeqやMig-Seq、GRAS-Di
 など）では、このような重複リードの除去は不必要です。
 ```
-$ cd $bwa_out_folder
-$ gatk MarkDuplicates -I $bwa_out_folder/ERR038793.sorted.bam -M $bwa_out_folder/ERR038793.metrics.txt -O $bwa_out_folder/ERR038793.markdup.bam
+cd $bwa_out_folder
+gatk MarkDuplicates -I $bwa_out_folder/ERR038793.sorted.bam -M $bwa_out_folder/ERR038793.metrics.txt -O $bwa_out_folder/ERR038793.markdup.bam
 ```
 さらに複数箇所にマッピングされたリードも偽陽性の原因となるので、除去しておきます。
 ```
-$ samtools view -@ no_threads -b -q 4 $bwa_out_folder/ERR038793.markdup.bam > $bwa_out_folder/ERR038793.filtered.bam
-$ samtools index  -@ no_threads $bwa_out_folder/ERR038793.filtered.bam
+samtools view -@ no_threads -b -q 4 $bwa_out_folder/ERR038793.markdup.bam > $bwa_out_folder/ERR038793.filtered.bam
+samtools index  -@ no_threads $bwa_out_folder/ERR038793.filtered.bam
 ```
 
 前処理済みのbamファイルの概要を表示します。
 ```
-$ bamtools stats -in ERR038793.filtered.bam
+bamtools stats -in ERR038793.filtered.bam
 ```
 ```
 **********************************************
@@ -352,11 +350,11 @@ Singletons:        1958	(0.174686%)
 gatk HaplotypeCaller コマンドを使って、対象サンプルのジェノタイプの推定をおこないます。gatk ver4.0以降の HaplotypeCaller ではアクティブ領域 (各塩基のエントロピーの計算に基づいてバリアントの存在が予想される領域) を検出し、局所アッセンブルを実施することで、SNPs/INDELの検出精度が向上するという工夫が施されています。
 
 ```
-$ gatk HaplotypeCaller -R $reference_folder/ScerCer3.fa -I $bwa_out_folder/ERR038793.filtered.bam --bam-output $bwa_out_folder/ERR038793.hpcall.bam -O $vcf_out_folder/ERR038793.raw.vcf
+gatk HaplotypeCaller -R $reference_folder/ScerCer3.fa -I $bwa_out_folder/ERR038793.filtered.bam --bam-output $bwa_out_folder/ERR038793.hpcall.bam -O $vcf_out_folder/ERR038793.raw.vcf
 ```
 処理が済むとVcf形式のファイルが作られます。vcfファイルの中身を見てみましょう。
 ```
-$ less $vcf_out_folder/ERR038793.raw.vcf
+less $vcf_out_folder/ERR038793.raw.vcf
 ```
 ```
 ##fileformat=VCFv4.2
@@ -386,7 +384,7 @@ vcf形式の解説　https://bi.biopapyrus.jp/gwas/vcf.html
 
 SNPs/INDELsの総数を確認します。
 ```
-$ awk '!/^#/' $vcf_out_folder/ERR038793.raw.vcf | wc -l
+awk '!/^#/' $vcf_out_folder/ERR038793.raw.vcf | wc -l
 ```
 ```
 69151
@@ -396,23 +394,23 @@ $ awk '!/^#/' $vcf_out_folder/ERR038793.raw.vcf | wc -l
 
 次にジェノタイピングによって得られたvcfファイルからSNPsの情報だけを取り出します。SNPsとINDELsでは異なる閾値でフィルタリングする必要があるからです。
 ```
-$ gatk SelectVariants -R $reference_folder/ScerCer3.fa -V $vcf_out_folder/ERR038793.raw.vcf --select-type SNP -O $vcf_out_folder/ERR038793.snp.vcf
+gatk SelectVariants -R $reference_folder/ScerCer3.fa -V $vcf_out_folder/ERR038793.raw.vcf --select-type SNP -O $vcf_out_folder/ERR038793.snp.vcf
 ```
 
 gatk VariantFiltrationコマンドでフィルタリングします。まずサイトベースでの
 フィルタリングをおこないます。
 ```
-$ gatk VariantFiltration -R $reference_folder/ScerCer3.fa -V $vcf_out_folder/ERR038793.snp.vcf --filter-expression "MQ < 40.0" --filter-name "MQ40" --filter-expression "QUAL < 30.0" --filter-name "QUAL30" -O $vcf_out_folder/ERR038793.snp.filtered.vcf
+gatk VariantFiltration -R $reference_folder/ScerCer3.fa -V $vcf_out_folder/ERR038793.snp.vcf --filter-expression "MQ < 40.0" --filter-name "MQ40" --filter-expression "QUAL < 30.0" --filter-name "QUAL30" -O $vcf_out_folder/ERR038793.snp.filtered.vcf
 ```
 
 次いでサンプルベースのフィルタリングをおこないます。
 ```
-$ gatk VariantFiltration -R $reference_folder/ScerCer3.fa -V $vcf_out_folder/ERR038793.snp.filtered.vcf -G-filter "GQ < 20" -G-filter-name "GQ20" -G-filter "DP < 10" -G-filter-name "DP10" -O $vcf_out_folder/ERR038793.snp.DPfiltered.vcf
+gatk VariantFiltration -R $reference_folder/ScerCer3.fa -V $vcf_out_folder/ERR038793.snp.filtered.vcf -G-filter "GQ < 20" -G-filter-name "GQ20" -G-filter "DP < 10" -G-filter-name "DP10" -O $vcf_out_folder/ERR038793.snp.DPfiltered.vcf
 ```
 
 最終的にコールされたSNPsの数を確認します。
 ```
-$ awk '!/^#/' $vcf_out_folder/ERR038793.snp.DPfiltered.vcf | wc -l
+awk '!/^#/' $vcf_out_folder/ERR038793.snp.DPfiltered.vcf | wc -l
 ```
 ```
 63195
@@ -421,7 +419,9 @@ $ awk '!/^#/' $vcf_out_folder/ERR038793.snp.DPfiltered.vcf | wc -l
 
 <h2 id="ゲノムビューワーによる視覚化">5.&nbsp;ゲノムビューワーによる視覚化</h2>
 
-...
+[Integrated Genome Viewer (IGV)](https://software.broadinstitute.org/software/igv/)を使って、マッピングやバリアントコールの結果を視覚化してみましょう。
+
+IGVの使い方について　https://bi.biopapyrus.jp/rnaseq/mapping/igv/
 
 ---
 ---
