@@ -11,7 +11,7 @@
 
 ## 概要
 
-初心者向けのNGSデータ解析のチュートリアルです。公開NGSデータの取得から変異検出までの解析手順の流れを酵母（ *Saccharomyces* *cerevisiae* ）のリシーケンス解析を題材として学びます。
+初心者向けのNGSデータ解析のチュートリアルです。公開NGSデータの取得から変異検出までの解析手順の流れについて、酵母のリシーケンス解析 (illuminaショートリード) を例に学びます。
 
 
 
@@ -32,19 +32,21 @@
 ---
 
 # リシーケンスのドライ解析のチュートリアル
-出芽酵母（ *Saccharomyces* *cerevisiae* ）は、真核生物の中で最初にゲノム解読がおこなわれたモデル生物です。ゲノムサイズ（12.1Mb）が小さいため、塩基配列データもコンパクトで扱いやすく、高スペックの計算機でなくてもデータ解析をおこなうことができます。酵母のリシーケンスを題材として、公開データの取得から変異検出までの解析処理の流れを学びます。なお解析環境として、Ubuntuマシンに[使用NGSツールのリスト](#使用NGSツールのリスト)がインストール済みであることを想定しています。
+出芽酵母（ *Saccharomyces* *cerevisiae* ）は、真核生物として最初にゲノムが解読されたモデル生物です。ゲノムサイズ（12.1Mb）が小さいため、塩基配列データもコンパクトで扱いやすく、高スペックの計算機でなくてもデータ解析をおこなうことができます。酵母のリシーケンスを例題として、公開データの取得から変異検出までの解析処理の流れを学びます。なお解析環境として、Ubuntuマシンに[使用NGSツールのリスト](#使用NGSツールのリスト)がインストール済みであることを想定しています。
 
 ## 本チュートリアルの流れ
 
 1. [公開データ取得](#公開データ取得)
 
-2. [リードのクオリティーコントロール](#リードのクオリティーコントロール)
+2. [リードのクオリティーコントロール（QC）](#リードのクオリティーコントロール（QC）)
 
 3. [マッピング](#マッピング)
 
-4. [バリアントコール](#バリアントコール)
+4. [変異検出](#変異検出)
 
-5. [ゲノムビューワーによる視覚化](#ゲノムビューワーによる視覚化)
+5. [ゲノムビューワーによる変異の視覚化](#ゲノムビューワーによる変異の視覚化)
+
+![](images/ngs_training_01.png)
 
 <h2 id="公開データ取得">1.&nbsp;公開データ取得</h2>
 
@@ -60,13 +62,30 @@ fastq_folder=$main_folder/fastq
 mkdir -p $fastq_folder
 cd $fastq_folder
 ```
-SRA-toolkitのfastq-dumpコマンドを使って、生リードデータ [ERR038793](https://www.ncbi.nlm.nih.gov/sra/ERR038793) を[DRA/SRA/ERAデータベース](https://www.ddbj.nig.ac.jp/dra/index.html)からダウンロードします。
+SRA-toolkitのfastq-dumpコマンドを使って、生リードデータ [ERR038793](https://www.ncbi.nlm.nih.gov/sra/ERR038793) を[DRA/SRA/ERAデータベース](https://www.ddbj.nig.ac.jp/dra/index.html)からダウンロードします。まずfastq-dumpのバージョンを確認します。解析の再現性担保のために使用ツールのバージョンを把握するようにしましょう。
 ```
-fastq-dump --split-files ERR038793 #オプション--split-filesでペアエンドのSRAデータを２つのfastqに分割
+fastq-dump --version
 ```
-処理が済むと、リードデータとして2つのfastq形式のファイル（ERR038793_1.fastq とERR038793_2.fastq）が作成されます。リードデータの冒頭部分を見てみましょう。
 ```
- ERR038793_1.fastq　#fastqの先頭部分を閲覧
+fastq-dump : 2.8.0
+```
+次いでfastq-dumpの使い方をhelpで確認してみましょう。
+```
+fastq-dump --help
+```
+```
+Usage:
+  fastq-dump [options] <path> [<path>...]
+  fastq-dump [options] <accession>
+...
+```
+fastq-dumpコマンドにオプション--split-filesをつけて実行することで、ペアエンドのSRAデータ[ERR038793](https://www.ncbi.nlm.nih.gov/sra/ERR038793)は２つのfastqに分割して取得されます。
+```
+fastq-dump --split-files ERR038793
+```
+処理が済むと、RR038793_1.fastq とERR038793_2.fastqという２つのファイルが作成されます。ペアエンド１のRR038793_1.fastqを対象に冒頭部分を見てみましょう。
+```
+head ERR038793_1.fastq　#fastqの先頭部分を閲覧
 ```
 ```
 @ERR038793.1 1 length=100
@@ -77,7 +96,7 @@ D/DDBD@B>DFFEEEEEEEEF@FDEEEBEDBBDDD:AEEE<>CB?FCFF@F?FBFF@?:EEE:EEBEEEB=EEE.>>?=A
 TGGTGGTATAAAGTGGTAGGGTAAGTATGTGTGTATTATTTACGATCATTTGTTAGCGTTTCAATATGGTGGGTAAAAACGCAGGATAGTGAGTTACCGA
 ...
 ```
-次いでリードデータの概要を確認します。
+次いでfastq/fasta操作ツールであるseqkitを用いて、ペアエンド１の概要を確認してみましょう。
 ```
 seqkit stats ERR038793_1.fastq　#seqkitはfasta/fastqの操作ツール
 ```
@@ -85,7 +104,7 @@ seqkit stats ERR038793_1.fastq　#seqkitはfasta/fastqの操作ツール
 file    format  type  num_seqs      sum_len   min_len   avg_len   max_len
 ERR038793_1.fastq   FASTQ DNA 739,873 73,987,300  100 100 100
 ```
-ペアエンド１のリード数は739,873個、計73,987,300bpです。
+ペアエンド１は、リード長が100bp、リード数は739,873個で、総計73,987,300bpです。
 
 作業を終えたら、メインの作業フォルダに戻っておきましょう。
 
@@ -129,7 +148,7 @@ ScerCer3.fa  FASTA   DNA         17  12,157,105   85,779  715,123.8  1,531,933
 cd $main_folder
 ```
 
-<h2 id="リードのクオリティーコントロール">2.&nbsp;リードのクオリティーコントロール</h2>
+<h2 id="リードのクオリティーコントロール（QC）">2.&nbsp;リリードのクオリティーコントロール（QC）</h2>
 
 NGSから出力されるリードにはアダプター配列や低品質のリードが含まれている場合があります。データ前処理として、リードデータの品質を確認し、ノイズとなりそうなリードやアダプター配列、塩基を取り除いておきます。前者をリードクオリティーチェック、後者をリードフィルタリング(またはリードトリミング）と呼び、これらの一連の処理をクオリティーコントロール（Quality control: QC)と呼びます。
 
@@ -154,7 +173,7 @@ fastqc seqfile1 seqfile2 .. seqfileN
 ```
 FastQCを実行すると、QCの結果がHTML形式でレポート出力されます。
 ```
-fastqc ERR038793_1.fastq　
+fastqc ERR038793_1.fastq ERR038793_1.fastq
 ```
 [上記のFastQC解析のレポート例](https://github.com/akihirao/how2cook/tree/main/ngs_training/ERR038793_1_fastqc.html)
 
@@ -288,9 +307,9 @@ Singletons:        2260	(0.179572%)
 ```
 
 
-<h2 id="バリアントコール">4.&nbsp;バリアントコール</h2>
+<h2 id="変異検出">4.&nbsp;変異検出</h2>
 
-GATK (Genome Analysis toolkit)を使用して、BAMファイルからSNPなどのバリアントを検出します。
+GATK (Genome Analysis toolkit)を使用して、BAMファイルから変異を検出します。
 
 まずリファレンス配列に対してGATK用のインデックスを作成しておきましょう。
 ```
@@ -420,7 +439,7 @@ awk '!/^#/' $vcf_out_folder/ERR038793.snp.DPfiltered.vcf | wc -l
 ```
 最終的に63195個のSNPsが検出されました。
 
-<h2 id="ゲノムビューワーによる視覚化">5.&nbsp;ゲノムビューワーによる視覚化</h2>
+<h2 id="ゲノムビューワーによる変異の視覚化">5.&nbsp;ゲノムビューワーによる変異の視覚化</h2>
 
 [Integrated Genome Viewer (IGV)](https://software.broadinstitute.org/software/igv/)を使って、マッピングやバリアントコールの結果を視覚化してみましょう。
 
