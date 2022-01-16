@@ -54,7 +54,11 @@
 
 酵母のリシーケンスの生リードデータ [ERR038793](https://www.ncbi.nlm.nih.gov/sra/ERR038793) を公共データベースからダウンロードします。
 
-まず、こんな感じでメインの作業フォルダおよびリードデータの保管フォルダを作っておきます。
+[ERR038793](https://www.ncbi.nlm.nih.gov/sra/ERR038793) のリンクを辿ってメタ情報をみると、illumina Hiseq 2000 で解読したペアエンドリードのデータであることが分かります。
+
+![](images/ngs_training_02.png)
+
+ダウンロードする前に、こんな感じでメインの作業フォルダおよびリードデータの保管フォルダを作っておきます。
 ```
 user_name=hogehoge #アカウント名:hogehogeの場合
 main_folder=/home/$user_name/work/Scer
@@ -62,7 +66,7 @@ fastq_folder=$main_folder/fastq
 mkdir -p $fastq_folder
 cd $fastq_folder
 ```
-SRA-toolkitのfastq-dumpコマンドを使って、生リードデータ [ERR038793](https://www.ncbi.nlm.nih.gov/sra/ERR038793) を[DRA/SRA/ERAデータベース](https://www.ddbj.nig.ac.jp/dra/index.html)からダウンロードします。まずfastq-dumpのバージョンを確認します。解析の再現性担保のために使用ツールのバージョンを把握するようにしましょう。
+ブラウザからは直接fastq形式のリードデータをダウンロードすることはできません。そこでSRA-toolkitのfastq-dumpコマンドを使って、生リードデータ [ERR038793](https://www.ncbi.nlm.nih.gov/sra/ERR038793) を[DRA/SRA/ERAデータベース](https://www.ddbj.nig.ac.jp/dra/index.html)からダウンロードします。NGSツールを使う際には、解析の再現性担保のために、そのツールのバージョンを確認するようにしましょう。
 ```
 fastq-dump --version
 ```
@@ -79,7 +83,7 @@ Usage:
   fastq-dump [options] <accession>
 ...
 ```
-fastq-dumpコマンドにオプション--split-filesをつけて実行することで、ペアエンドのSRAデータ[ERR038793](https://www.ncbi.nlm.nih.gov/sra/ERR038793)は２つのfastqに分割して取得されます。
+fastq-dumpコマンドにオプション--split-filesをつけて実行することで、ペアエンドのSRAデータ [ERR038793](https://www.ncbi.nlm.nih.gov/sra/ERR038793) は２つのfastqに分割して取得されます。
 ```
 fastq-dump --split-files ERR038793
 ```
@@ -96,6 +100,8 @@ D/DDBD@B>DFFEEEEEEEEF@FDEEEBEDBBDDD:AEEE<>CB?FCFF@F?FBFF@?:EEE:EEBEEEB=EEE.>>?=A
 TGGTGGTATAAAGTGGTAGGGTAAGTATGTGTGTATTATTTACGATCATTTGTTAGCGTTTCAATATGGTGGGTAAAAACGCAGGATAGTGAGTTACCGA
 ...
 ```
+Fastq形式について https://qiita.com/hayatak/items/0ab4f8bc3c051dd9a0d4
+
 次いでfastq/fasta操作ツールであるseqkitを用いて、ペアエンド１の概要を確認してみましょう。
 ```
 seqkit stats ERR038793_1.fastq　#seqkitはfasta/fastqの操作ツール
@@ -106,7 +112,7 @@ ERR038793_1.fastq   FASTQ DNA 739,873 73,987,300  100 100 100
 ```
 ペアエンド１は、リード長が100bp、リード数は739,873個で、総計73,987,300bpです。
 
-作業を終えたら、メインの作業フォルダに戻っておきましょう。
+確認を終えたら、メインの作業フォルダに戻っておきましょう。
 
 ```
 cd $main_folder　
@@ -205,7 +211,7 @@ fastp処理が完了すると、フィルタリング前後の結果がHTML形�
 
 <h2 id="マッピング">3.&nbsp;マッピング</h2>
 
-定番のマッピングツールであるbwaを使います。Bwaにはいくつかのアルゴリズがありますが、ここではbwa-memを使います。なおbwa-memアルゴリズムのネクストバーションが独立したツール [bwa-mem2](https://github.com/bwa-mem2/bwa-mem2) として公開されており、高速化を図るならば、おすすめです（ただしメモリ使用量やインデックスサイズも大きくなるので、導入する際には留意して下さい）。
+定番のマッピングツールであるbwaを使います。Bwaにはいくつかのアルゴリズがありますが、ここではbwa-memを使います。なおbwa-memアルゴリズムのネクストバーションが独立したツール [bwa-mem2](https://github.com/bwa-mem2/bwa-mem2) として公開されており、高速化に適しています（ただしメモリ使用量やインデックスサイズも大きくなるので、導入する際には留意して下さい）。
 
 #### 3-1. リファレンスのインデックス作成
 
