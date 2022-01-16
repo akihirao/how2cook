@@ -1,6 +1,6 @@
 # お品書き
 ## 1. [NGSデータ解析チュートリアル](https://github.com/akihirao/how2cook/tree/main/ngs_training)
-####  酵母のリシーケンスを例として、公開データの取得から変異検出までの解析フローを解説
+####  公開NGSデータの取得から変異検出までの解析フローを解説
 
 ## 2. [リードデータのDRAへの登録方法](https://github.com/akihirao/how2cook/tree/main/how2submit_DRA)
 ####  DRAへの他検体の登録などの覚書
