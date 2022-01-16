@@ -54,7 +54,7 @@
 
 酵母のリシーケンスの生リードデータ [ERR038793](https://www.ncbi.nlm.nih.gov/sra/ERR038793) を公共データベースからダウンロードします。
 
-[ERR038793](https://www.ncbi.nlm.nih.gov/sra/ERR038793) のリンクを辿ってメタ情報をみると、illumina Hiseq 2000 で解読したペアエンドリードのデータであることが分かります。
+[ERR038793](https://www.ncbi.nlm.nih.gov/sra/ERR038793) のリンクからメタ情報をみると、illumina Hiseq 2000 で解読したペアエンドリードのデータであることが分かります。
 
 ![](images/ngs_training_02.png)
 
@@ -66,7 +66,7 @@ fastq_folder=$main_folder/fastq
 mkdir -p $fastq_folder
 cd $fastq_folder
 ```
-ブラウザからは直接fastq形式のリードデータをダウンロードすることはできません。そこでSRA-toolkitのfastq-dumpコマンドを使って、生リードデータ [ERR038793](https://www.ncbi.nlm.nih.gov/sra/ERR038793) を[DRA/SRA/ERAデータベース](https://www.ddbj.nig.ac.jp/dra/index.html)からダウンロードします。NGSツールを使う際には、解析の再現性担保のために、そのツールのバージョンを確認するようにしましょう。
+ブラウザからは直接fastq形式のリードデータをダウンロードすることはできません。そこでSRA-toolkitのfastq-dumpコマンドを使って、生リードデータ [ERR038793](https://www.ncbi.nlm.nih.gov/sra/ERR038793) を[DRA/SRA/ERAデータベース](https://www.ddbj.nig.ac.jp/dra/index.html)からダウンロードします。NGSツールを使う際には、解析の再現性担保のために、そのツールのバージョンを確認することが大切です。
 ```
 fastq-dump --version
 ```
@@ -211,7 +211,11 @@ fastp処理が完了すると、フィルタリング前後の結果がHTML形�
 
 <h2 id="マッピング">3.&nbsp;マッピング</h2>
 
-定番のマッピングツールであるbwaを使います。Bwaにはいくつかのアルゴリズがありますが、ここではbwa-memを使います。なおbwa-memアルゴリズムのネクストバーションが独立したツール [bwa-mem2](https://github.com/bwa-mem2/bwa-mem2) として公開されており、高速化に適しています（ただしメモリ使用量やインデックスサイズも大きくなるので、導入する際には留意して下さい）。
+マッピングとは、シーケンサーから出てきた大量の塩基配列リードついて、参照ゲノム配列の中の該当する箇所を見つける処理です。
+
+![](images/ngs_training_4_01.png)
+
+定番のマッピングツールであるbwaを使ってマッピングします。Bwaにはいくつかのアルゴリズがありますが、ここではbwa-memを使います。なおbwa-memアルゴリズムのネクストバーションが独立したツール [bwa-mem2](https://github.com/bwa-mem2/bwa-mem2) として公開されており、高速化に適しています（ただしメモリ使用量やインデックスサイズも大きくなるので、導入する際には留意して下さい）。
 
 #### 3-1. リファレンスのインデックス作成
 
@@ -451,6 +455,8 @@ awk '!/^#/' $vcf_out_folder/ERR038793.snp.DPfiltered.vcf | wc -l
 
 IGVの使い方について　https://bi.biopapyrus.jp/rnaseq/mapping/igv/
 
+表示例
+![](images/ngs_training_5_01.png)
 ---
 ---
 
