@@ -154,7 +154,7 @@ ScerCer3.fa  FASTA   DNA         17  12,157,105   85,779  715,123.8  1,531,933
 cd $main_folder
 ```
 
-<h2 id="リードのクオリティーコントロール（QC）">2.&nbsp;リリードのクオリティーコントロール（QC）</h2>
+<h2 id="リードのクオリティーコントロール（QC）">2.&nbsp;リードのクオリティーコントロール（QC）</h2>
 
 NGSから出力されるリードにはアダプター配列や低品質のリードが含まれている場合があります。データ前処理として、リードデータの品質を確認し、ノイズとなりそうなリードやアダプター配列、塩基を取り除いておきます。前者をリードクオリティーチェック、後者をリードフィルタリング(またはリードトリミング）と呼び、これらの一連の処理をクオリティーコントロール（Quality control: QC)と呼びます。
 
@@ -179,7 +179,7 @@ fastqc seqfile1 seqfile2 .. seqfileN
 ```
 FastQCを実行すると、QCの結果がHTML形式でレポート出力されます。
 ```
-fastqc ERR038793_1.fastq ERR038793_1.fastq
+fastqc ERR038793_1.fastq ERR038793_2.fastq
 ```
 [上記のFastQC解析のレポート例](https://github.com/akihirao/how2cook/tree/main/ngs_training/ERR038793_1_fastqc.html)
 
