@@ -23,11 +23,13 @@
   - [(Rで)塩基配列解析](http://www.iu.a.u-tokyo.ac.jp/~kadota/r_seq.html): 門田先生らによる充実サイト
   - [統合TV（NGS解析だけでなくDBなども）](http://togotv.dbcls.jp)
   - [Linux標準教科書](http://www.lpi.or.jp/linuxtext/text.shtml)
+
+
 - 書籍
   - [「入門者のLinux」(奈佐原顕郎著)](https://gendai.ismedia.jp/list/books/bluebacks/9784062579896):Linux初心者の方におすすめです
 
 
-
+- [よく使うシェルコマンド](#よく使うシェルコマンド)
 
 ---
 
@@ -429,13 +431,20 @@ awk '!/^#/' $vcf_out_folder/ERR038793.raw.vcf | wc -l
 gatk SelectVariants -R $reference_folder/ScerCer3.fa -V $vcf_out_folder/ERR038793.raw.vcf --select-type SNP -O $vcf_out_folder/ERR038793.snp.vcf
 ```
 
-gatk VariantFiltrationコマンドでフィルタリングします。まずサイトベースの
-フィルタリングをおこないます。
+gatk VariantFiltrationコマンドでフィルタリングします。
+* [gatkによるフィルタリングのパラメーターと数値の意味の解説](https://gatk.broadinstitute.org/hc/en-us/articles/360035531112?id=6925)
+
+まずvcfファイルのINFO fieldを対象としてサイトベースの
+フィルタリング (オプション -filter-expression) をおこないます。。
+ここでは比較的シンプルな設定を適用します。
+* [gatkによる -filter/--filter-expression の解説](https://gatk.broadinstitute.org/hc/en-us/articles/360037434691-VariantFiltration#--filter-expression)
+
 ```
 gatk VariantFiltration -R $reference_folder/ScerCer3.fa -V $vcf_out_folder/ERR038793.snp.vcf --filter-expression "MQ < 40.0" --filter-name "MQ40" --filter-expression "QUAL < 30.0" --filter-name "QUAL30" -O $vcf_out_folder/ERR038793.snp.filtered.vcf
 ```
 
-次いでサンプルベースのフィルタリングをおこないます。
+次いでサンプルベースのフィルタリング (オプション -G-filter) をおこないます。こちらも比較的シンプルな設定です。
+* [gatkによる -G-filter/--genotype-filter-expression の解説](https://gatk.broadinstitute.org/hc/en-us/articles/360037434691-VariantFiltration#--genotype-filter-expression)
 ```
 gatk VariantFiltration -R $reference_folder/ScerCer3.fa -V $vcf_out_folder/ERR038793.snp.filtered.vcf -G-filter "GQ < 20" -G-filter-name "GQ20" -G-filter "DP < 10" -G-filter-name "DP10" -O $vcf_out_folder/ERR038793.snp.DPfiltered.vcf
 ```
@@ -447,7 +456,11 @@ awk '!/^#/' $vcf_out_folder/ERR038793.snp.DPfiltered.vcf | wc -l
 ```
 63195
 ```
-最終的に63195個のSNPsが検出されました。
+最終的に63195個のSNPsが検出されました。メインの作業フォルダに戻っておきましょう。
+```
+cd $main_folder
+```
+以上で、本チュートリアルにおけるコマンドライン操作は全て終了です。
 
 <h2 id="ゲノムビューワーによる変異の視覚化">5.&nbsp;ゲノムビューワーによる変異の視覚化</h2>
 
@@ -456,7 +469,23 @@ awk '!/^#/' $vcf_out_folder/ERR038793.snp.DPfiltered.vcf | wc -l
 IGVの使い方について　https://bi.biopapyrus.jp/rnaseq/mapping/igv/
 
 表示例
+
 ![](images/ngs_training_5_01.png)
+
+<h2 id="6. その他">6.&nbsp;その他</h2>
+
+#### 複数サンプルからの変異検出について
+
+本チュートリアルでは1サンプルのみを対象として変異検出をおこなったので、single sample genotypingという方法を用いています。一方で、複数サンプルを対象とする場合は、すべてのサンプルをまとめてジェノタイピングする joint genotypingという方法がおすすめです。変異検出の精度が向上することが知られていますので、ぜひ適用を試みて下さい。
+* [gatkによるsingle sample genotypingと joint genotypingの解説](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-)
+
+そして複数サンプルを対象としてジェノタイピングをおこなうと、各々のサンプルによって遺伝子型が欠損するようなサイトがたびたび生じます。そのような欠損サイトの取扱や注意点いについて、ゲノム縮約シーケンスデータを対象とした岩崎貴也さんの次の講演資料が参考になります。
+
+* [NGSのSNPデータを集団遺伝解析に使う事の利点と欠点：非モデル生物の研究で気をつけることは？](https://drive.google.com/file/d/1UK04C1IbHGvosibPWjjbKT1t1pcaTR9-/view)
+
+---
+[ページトップに戻る](https://github.com/akihirao/how2cook/tree/main/ngs_training#NGSデータ解析チュートリアル)
+
 ---
 ---
 
@@ -517,3 +546,33 @@ $ cd /home/hogehoge/local
 $ git clone https://github.com/lh3/bwa.git
 $ cd bwa; make
 ```
+
+---
+---
+<h2 id="よく使うシェルコマンド">よく使うシェルコマンド</h2>
+
+ディレクトリ操作系
+```
+cd ~/ #ホームディレクトリに移動
+cd hogehoge #ディレクトリhogehogeに移動
+cd ../ #階層が一つ上のディレクトリに移動
+pwd #現在のディレクトリを表示
+```
+ファイル操作系
+```
+cp file1 file2 #file1をfile2としてコピー
+rm file1 #file1を削除
+mv file1 file2 #file1をfile2に移動（file１は消える）
+```
+ファイル表示系
+```
+cat file1 #無圧縮ファイル file1 を画面に出力
+lesss file1 #無圧縮ファイル file1 をスクロールしながら見る
+gzip -dc file1.gz #gzip圧縮ファイルを画面に出力
+gzip -dc file1.gz | less #gzip圧縮ファイルをスクロールしながら見る
+head file1 #無圧縮ファイル file1 の冒頭を画面出力
+head -n 4 file1 #無圧縮ファイル file1 の冒頭の４行を画面出力
+grep -c '^>' input.fasta | wc -l #fastaの配列数を表示
+```
+
+[ページトップに戻る](https://github.com/akihirao/how2cook/tree/main/ngs_training#NGSデータ解析チュートリアル)
