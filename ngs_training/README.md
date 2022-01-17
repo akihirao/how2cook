@@ -456,7 +456,11 @@ awk '!/^#/' $vcf_out_folder/ERR038793.snp.DPfiltered.vcf | wc -l
 ```
 63195
 ```
-最終的に63195個のSNPsが検出されました。
+最終的に63195個のSNPsが検出されました。メインの作業フォルダに戻っておきましょう。
+```
+cd $main_folder
+```
+以上で、本チュートリアルにおけるコマンドライン操作は全て終了です。
 
 <h2 id="ゲノムビューワーによる変異の視覚化">5.&nbsp;ゲノムビューワーによる変異の視覚化</h2>
 
@@ -465,6 +469,7 @@ awk '!/^#/' $vcf_out_folder/ERR038793.snp.DPfiltered.vcf | wc -l
 IGVの使い方について　https://bi.biopapyrus.jp/rnaseq/mapping/igv/
 
 表示例
+
 ![](images/ngs_training_5_01.png)
 
 ---
