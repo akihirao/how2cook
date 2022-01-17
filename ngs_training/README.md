@@ -472,6 +472,17 @@ IGVの使い方について　https://bi.biopapyrus.jp/rnaseq/mapping/igv/
 
 ![](images/ngs_training_5_01.png)
 
+<h2 id="6. その他">6.&nbsp;その他</h2>
+
+#### 複数サンプルからの変異検出について
+
+本チュートリアルでは1サンプルのみを対象として変異検出をおこなったので、single sample genotypingという方法を用いています。一方で、複数サンプルを対象とする場合は、すべてのサンプルをまとめてジェノタイピングする joint genotypingという方法がおすすめです。変異検出の精度が向上することが知られていますので、ぜひ適用を試みて下さい。
+* [gatkによるsingle sample genotypingと joint genotypingの解説](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-)
+
+そして複数サンプルを対象としてジェノタイピングをおこなうと、各々のサンプルによって遺伝子型が欠損するようなサイトがたびたび生じます。そのような欠損サイトの取扱や注意点いについて、ゲノム縮約シーケンスデータを対象とした岩崎貴也さんの次の講演資料が参考になります。
+
+* [NGSのSNPデータを集団遺伝解析に使う事の利点と欠点：非モデル生物の研究で気をつけることは？](https://drive.google.com/file/d/1UK04C1IbHGvosibPWjjbKT1t1pcaTR9-/view)
+
 ---
 [ページトップに戻る](https://github.com/akihirao/how2cook/tree/main/ngs_training#NGSデータ解析チュートリアル)
 
