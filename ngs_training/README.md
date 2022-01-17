@@ -131,12 +131,19 @@ cd $reference_folder
 wgetコマンドで酵母のリファレンスゲノムを取得します。
 ```
 wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2_R64/GCF_000146045.2_R64_genomic.fna.gz
+```
+Macではwgetコマンドの代わりにcurlコマンドを使って下さい。
+```
+curl -O https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2_R64/GCF_000146045.2_R64_genomic.fna.gz
+```
+ダウンロードした圧縮ファイルを解答して、コンパクトな名前に付け替えます。
+```
 gzip -d GCF_000146045.2_R64_genomic.fna.gz　#gzを展開
 mv GCF_000146045.2_R64_genomic.fna ScerCer3.fa #コンパクトな名前に変更
 ```
 リファレンスゲノムの中身確認
 ```
-head ERR038793_1.fastq　#fastqの先頭部分を閲覧
+head  ScerCer3.fa　#fasta形式の塩基配列ファイルの先頭部分を閲覧
 ```
 ```
 >NC_001133.9 Saccharomyces cerevisiae S288C chromosome I, complete sequence
