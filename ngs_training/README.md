@@ -468,6 +468,9 @@ IGVの使い方について　https://bi.biopapyrus.jp/rnaseq/mapping/igv/
 ![](images/ngs_training_5_01.png)
 
 ---
+[ページトップに戻る](https://github.com/akihirao/how2cook/tree/main/ngs_training#NGSデータ解析チュートリアル)
+
+---
 ---
 
 <h2 id="使用NGSツールのリスト">使用NGSツールのリスト</h2>
@@ -555,3 +558,5 @@ head file1 #無圧縮ファイル file1 の冒頭を画面出力
 head -n 4 file1 #無圧縮ファイル file1 の冒頭の４行を画面出力
 grep -c '^>' input.fasta | wc -l #fastaの配列数を表示
 ```
+
+[ページトップに戻る](https://github.com/akihirao/how2cook/tree/main/ngs_training#NGSデータ解析チュートリアル)
