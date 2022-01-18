@@ -10,14 +10,18 @@ SCRIPT_DIR=$(cd $(dirname $0)  && pwd)
 ######################################
 ## 1. 公開データ取得
 
-user_name=hogehoge #アカウント名:hogehogeの場合
-main_folder=/home/$user_name/work/Scer
+#user_name=hogehoge #アカウント名:hogehogeの場合
+main_folder=$SCRIPT_DIR/Scer
+mkdir -p $main_folder
 fastq_folder=$main_folder/fastq
 mkdir -p $fastq_folder
 cd $fastq_folder
 
 # 酵母のリシーケンスの生リードデータERR038793の取得
-fastq-dump --split-files ERR038793
+#fastq-dump --split-files ERR038793
+
+# 日本酒酵母のリシーケンスの生リードデータERR038793の取得
+#fastq-dump --split-files SRR13254428
 
 cd $main_folder
 
@@ -32,8 +36,11 @@ wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2_R6
 # Macではwgetコマンドの代わりにcurlコマンドを使って下さい。
 #curl -O https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2_R64/GCF_000146045.2_R64_genomic.fna.gz
 
-gzip -d GCF_000146045.2_R64_genomic.fna.gz　#gzを展開
-mv GCF_000146045.2_R64_genomic.fna ScerCer3.fa #コンパクトな名前に変更
+#gzを展開
+gzip -d GCF_000146045.2_R64_genomic.fna.gz
+
+#コンパクトな名前に変更
+mv GCF_000146045.2_R64_genomic.fna ScerCer3.fa
 
 cd $main_folder
 
@@ -92,6 +99,6 @@ gatk VariantFiltration -R $reference_folder/ScerCer3.fa -V $vcf_out_folder/ERR03
 # VcfファイルのFORMAT fieldを対象としたサンプルベースのフィルタリング
 gatk VariantFiltration -R $reference_folder/ScerCer3.fa -V $vcf_out_folder/ERR038793.snp.filtered.vcf -G-filter "GQ < 20" -G-filter-name "GQ20" -G-filter "DP < 10" -G-filter-name "DP10" -O $vcf_out_folder/ERR038793.snp.DPfiltered.vcf
 
-cd $main_folder
+cd $SCRIPT_DIR
 
 ######################################
