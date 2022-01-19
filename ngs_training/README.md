@@ -510,6 +510,7 @@ IGVの使い方について　https://bi.biopapyrus.jp/rnaseq/mapping/igv/
 * Plink: whole-genome association analysis tool https://www.cog-genomics.org/plink
 * samtools*: tools for manipulating NGS data https://github.com/samtools/samtools
 * seqkit*: an ultrafast toolkit for FASTA/Q file manipulation https://github.com/shenwei356/seqkit
+* TASSEL: trait analysis by association, evolution and linkage https://www.maizegenetics.net/tassel
 * Trimmomatic: a flexible read trimming tool https://github.com/usadellab/Trimmomatic
 * vcftools: a set of tools for working with VCF files https://github.com/vcftools/vcftools
 
