@@ -557,8 +557,8 @@ git clone https://github.com/lh3/bwa.git
 cd bwa; make
 ```
 
-#### samtools: 2022/01/19時点の最新版はv1.14
-* htslibを含むソースからコンパイルする場合
+#### samtools
+* htslibを含むソースからコンパイルする場合 (2022/01/19時点の最新版はv1.14)
 
 ```
 cd /home/hogehoge/local
