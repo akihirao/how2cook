@@ -522,43 +522,44 @@ IGVの使い方について　https://bi.biopapyrus.jp/rnaseq/mapping/igv/
 #### SRA-toolkit
 Ubuntu 64 bit版を本家サイトからダウンロード https://github.com/ncbi/sra-tools/wiki/01.-Downloading-SRA-Toolkit
 ```
-$ cd /home/hogehoge/local
-$ wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/2.11.3/sratoolkit.2.11.3-ubuntu64.tar.gz　
-$ tar zxvf sratoolkit.2.11.3-ubuntu64.tar.gz
+cd /home/hogehoge/local
+wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/2.11.3/sratoolkit.2.11.3-ubuntu64.tar.gz　
+tar zxvf sratoolkit.2.11.3-ubuntu64.tar.gz
 ```
 
 
 #### fastqc
 ```
-$ cd /home/hogehoge/local
-$ wget https://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.11.9.zip
-$ unzip fastqc_v0.11.9.zip
+cd /home/hogehoge/local
+wget https://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.11.9.zip
+unzip fastqc_v0.11.9.zip
 ```
 
 
 #### fastp
 ```
-$ cd /home/hogehoge/local
+cd /home/hogehoge/local
 # download the latest build
-$ wget http://opengene.org/fastp/fastp
-$ chmod a+x ./fastp
+wget http://opengene.org/fastp/fastp
+chmod a+x ./fastp
 
 # or download specified version, i.e. fastp v0.23.1
-$wget http://opengene.org/fastp/fastp.0.23.1
-$mv fastp.0.23.1 fastp
-$chmod a+x ./fastp
+wget http://opengene.org/fastp/fastp.0.23.1
+mv fastp.0.23.1 fastp
+chmod a+x ./fastp
 ```
 
 
 #### BWA
 ```
-$ cd /home/hogehoge/local
-$ git clone https://github.com/lh3/bwa.git
-$ cd bwa; make
+cd /home/hogehoge/local
+git clone https://github.com/lh3/bwa.git
+cd bwa; make
 ```
 
 #### samtools: 2022/01/19時点の最新版はv1.14
 * htslibを含むソースからコンパイルする場合
+
 ```
 cd /home/hogehoge/local
 wget https://github.com/samtools/samtools/releases/download/1.14/samtools-1.14.tar.bz2
