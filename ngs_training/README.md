@@ -597,4 +597,7 @@ head -n 4 file1 #無圧縮ファイル file1 の冒頭の４行を画面出力
 grep -c '^>' input.fasta | wc -l #fastaの配列数を表示
 ```
 
+Linuxコマンド(Bash)でバックグラウンド実行する方法のまとめメモ https://qiita.com/inosy22/items/341cfc589494b8211844
+
+
 [ページトップに戻る](https://github.com/akihirao/how2cook/tree/main/ngs_training#NGSデータ解析チュートリアル)
