@@ -138,12 +138,15 @@ curl -O https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2
 ```
 ダウンロードした圧縮ファイルを解答して、コンパクトな名前に付け替えます。
 ```
-gzip -d GCF_000146045.2_R64_genomic.fna.gz　#gzを展開
-mv GCF_000146045.2_R64_genomic.fna ScerCer3.fa #コンパクトな名前に変更
+#gzを展開
+gzip -d GCF_000146045.2_R64_genomic.fna.gz
+#コンパクトな名前に変更
+mv GCF_000146045.2_R64_genomic.fna ScerCer3.fa
 ```
 リファレンスゲノムの中身確認
 ```
-head  ScerCer3.fa　#fasta形式の塩基配列ファイルの先頭部分を閲覧
+#fasta形式の塩基配列ファイルの先頭部分を閲覧
+head ScerCer3.fa
 ```
 ```
 >NC_001133.9 Saccharomyces cerevisiae S288C chromosome I, complete sequence
@@ -553,6 +556,18 @@ $ cd /home/hogehoge/local
 $ git clone https://github.com/lh3/bwa.git
 $ cd bwa; make
 ```
+
+#### samtools: 2022/01/19時点の最新版はv1.14
+* htslibを含むソースからコンパイルする場合
+```
+cd /home/hogehoge/local
+wget https://github.com/samtools/samtools/releases/download/1.14/samtools-1.14.tar.bz2
+tar -xvf samtools-1.14.tar.bz2
+cd samtools-1.14
+./configure
+make
+```
+
 
 ---
 ---
