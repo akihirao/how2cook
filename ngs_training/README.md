@@ -580,6 +580,22 @@ ls
 ## LICENSE       adapters        trimmomatic-0.33.jar
 ```
 
+#### Plink
+* ver.1.9をbinaryでインストール
+
+```
+wget https://s3.amazonaws.com/plink1-assets/plink_linux_x86_64_20210606.zip
+unzip plink_linux_x86_64_20210606.zip
+```
+
+#### Plink2
+* ver.2.0をbinaryでインストール
+
+```
+wget https://s3.amazonaws.com/plink2-assets/plink2_linux_x86_64_20211217.zip
+unzip plink2_linux_x86_64_20211217.zip
+```
+
 ---
 ---
 <h2 id="よく使うシェルコマンド">よく使うシェルコマンド</h2>
