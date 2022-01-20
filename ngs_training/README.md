@@ -569,7 +569,16 @@ cd samtools-1.14
 ./configure
 make
 ```
+#### Trimmomatic
+* ver.0.39をbinaryでインストール
 
+```
+wget http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.39.zip
+unzip Trimmomatic-0.39.zip
+cd Trimmomatic-0.39
+ls
+## LICENSE       adapters        trimmomatic-0.33.jar
+```
 
 ---
 ---
@@ -587,6 +596,11 @@ pwd #現在のディレクトリを表示
 cp file1 file2 #file1をfile2としてコピー
 rm file1 #file1を削除
 mv file1 file2 #file1をfile2に移動（file１は消える）
+```
+ファイル圧縮解凍系
+```
+gzip input.fastq #input.fastqをgzに圧縮
+gzip -d input.fastq.gz #解凍
 ```
 ファイル表示系
 ```
