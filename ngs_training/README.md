@@ -49,7 +49,7 @@
 
 ---
 
-<h2 id="Single sample genotyping">2.&nbsp;Single&nbsp;sample&nbsp;genotypingのワークフロー</h2>
+<h2 id="Single&nbsp;sample&nbsp;genotyping">2.&nbsp;Single&nbsp;sample&nbsp;genotypingのワークフロー</h2>
 
 <h3 id="公開データ取得">2.1.&nbsp;公開データ取得</h3>
 
@@ -474,7 +474,7 @@ cd $main_folder
 以上で、本チュートリアルにおけるコマンドライン操作は全て終了です。
 
 
-<h3 id="Joint genotypingのワークフロー">3.&nbsp;Joint genotypingのワークフロー</h3>
+<h3 id="Joint&nbsp;genotypingのワークフロー">3.&nbsp;Joint genotypingのワークフロー</h3>
 
 ##### 複数サンプルにおける欠損データの取り扱いについて
 
