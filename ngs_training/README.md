@@ -43,9 +43,9 @@
 
 出芽酵母（ *Saccharomyces* *cerevisiae* ）は、真核生物として最初にゲノムが解読されたモデル生物です。ゲノムサイズ（12.1Mb）が小さいため、塩基配列データもコンパクトで扱いやすく、高スペックの計算機でなくてもデータ解析をおこなうことができます。酵母のリシーケンスを例題として、公開データの取得から変異検出までの解析処理の流れを学びます。
 
-解析環境として、Ubuntuマシンに[使用NGSツールのリスト](#使用NGSツールのリスト)がインストール済みであることを想定しています。Macにおけるツール類の環境構築については、[こちら](https://kazumaxneo.hatenablog.com/entry/2019/10/16/122613)（上坂一馬さんのブログ） などを参考下さい。
+本チュートリアルの解析環境は、Ubuntuマシンに[使用NGSツールのリスト](#使用NGSツールのリスト)がインストール済みであることを想定しています。Macにおけるツール類の環境構築については、[こちら](https://kazumaxneo.hatenablog.com/entry/2019/10/16/122613)（上坂一馬さんのブログ） などを参考にして下さい。
 
-本チュートリアルでは、[GATKのgermline sort variant discoveryのワークフロー](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-)に基づいた変異検出法を紹介します。このワークフローには single sample genotyping と joint genotyping の２つのジェノタイピング方法があります。Single sample genotypingは１サンプルずつで処理するために、結果を逐次的に素早く取得することができます。一方で、joint genotypingはすべてのサンプルからの情報を活用して変異を検出するために、誤差が少なく高精度の推定法となります。しかしながら計算コストが増加することに加えて、サンプルが追加されるたびにjoing genotyping処理をやりなおすといった手間が必要になります。解析の目的や時間的制約に応じて、single sample genotyping と joint genotypingを使い分けるとよいでしょう。
+変異検出のパイプラインは、[GATKのgermline sort variant discoveryのワークフロー](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-)に基づいています。このワークフローのジェノタイピングには single sample genotyping と joint genotyping の２つの方法があります。Single sample genotypingは１サンプルずつで処理するために、結果を逐次的に素早く取得することができます。一方で、joint genotypingはすべてのサンプルからの情報を活用して変異を検出するために、誤差が少なく高精度の推定法となります。しかしながら計算コストが増加することに加えて、サンプルが追加されるたびにjoing genotyping処理をやりなおすといった手間が必要になります。解析の目的や時間的制約に応じて、single sample genotyping と joint genotypingを使い分けるとよいでしょう。
 
 ---
 ## 2. Single sample genotypingのワークフロー
