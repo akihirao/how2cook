@@ -17,7 +17,7 @@
 ## 目次
 #### 1. [はじめに](#はじめに)
 
-#### 2. [Single sample genotypingのワークフロー](#Single&nbsp;sample&nbsp;genotypingのワークフロー)
+#### 2. [Single&nbsp;sample&nbsp;genotypingのワークフロー](#Single&nbsp;sample&nbsp;genotypingのワークフロー)
 　2.1. [公開データ取得](#公開データ取得)
 
 　2.2. [リードのクオリティーコントロール（QC）](#リードのクオリティーコントロール（QC）)
