@@ -472,15 +472,6 @@ cd $main_folder
 ```
 以上で、本チュートリアルにおけるコマンドライン操作は全て終了です。
 
-<h2 id="ゲノムビューワーによる変異の視覚化">1.5.&nbsp;ゲノムビューワーによる変異の視覚化</h2>
-
-[Integrated Genome Viewer (IGV)](https://software.broadinstitute.org/software/igv/)を使って、マッピングやバリアントコールの結果を視覚化してみましょう。
-
-IGVの使い方について　https://bi.biopapyrus.jp/rnaseq/mapping/igv/
-
-表示例
-
-![](images/ngs_training_5_01.png)
 
 <h2 id="Joint genotypingのワークフロー">3.&nbsp;Joint genotypingのワークフロー</h2>
 
@@ -489,6 +480,17 @@ IGVの使い方について　https://bi.biopapyrus.jp/rnaseq/mapping/igv/
 複数サンプルを対象としてジェノタイピングをおこなうと、各々のサンプルによって遺伝子型が欠損するようなサイトがたびたび生じます。そのような欠損サイトの取扱や注意点いについて、ゲノム縮約シーケンスデータを対象とした岩崎貴也さんの次の講演資料が参考になります。
 
 * [NGSのSNPデータを集団遺伝解析に使う事の利点と欠点：非モデル生物の研究で気をつけることは？](https://drive.google.com/file/d/1UK04C1IbHGvosibPWjjbKT1t1pcaTR9-/view)
+
+
+<h2 id="その他">4.&nbsp;その他</h2>
+
+[Integrated Genome Viewer (IGV)](https://software.broadinstitute.org/software/igv/)を使って、マッピングやバリアントコールの結果を視覚化してみましょう。
+
+IGVの使い方について　https://bi.biopapyrus.jp/rnaseq/mapping/igv/
+
+表示例
+
+![](images/ngs_training_5_01.png)
 
 ---
 [ページトップに戻る](https://github.com/akihirao/how2cook/tree/main/ngs_training#NGSデータ解析チュートリアル)
