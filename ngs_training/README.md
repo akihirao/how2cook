@@ -574,9 +574,14 @@ git clone https://github.com/lh3/bwa.git
 cd bwa; make
 ```
 
+<<<<<<< HEAD
 #### samtools: 2022/01/19時点の最新版はv1.14
 * HTSlib入りのソースからコンパイルする例です。
 * HTSlib projectの一部となったtabixとbgzipなどもよく使われるツールですので、HTSlibもビルドしておきましょう。
+=======
+#### samtools
+* htslibを含むソースからコンパイルする場合 (2022/01/19時点の最新版はv1.14)
+>>>>>>> 7f286ceac7efd4fa9275544841c3b91bee5f1fd8
 
 ```
 cd /home/hogehoge/local
@@ -593,7 +598,32 @@ make
 ./bgzip --version
 
 ```
+#### Trimmomatic
+* ver.0.39をbinaryでインストール
 
+```
+wget http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.39.zip
+unzip Trimmomatic-0.39.zip
+cd Trimmomatic-0.39
+ls
+## LICENSE       adapters        trimmomatic-0.33.jar
+```
+
+#### Plink
+* ver.1.9をbinaryでインストール
+
+```
+wget https://s3.amazonaws.com/plink1-assets/plink_linux_x86_64_20210606.zip
+unzip plink_linux_x86_64_20210606.zip
+```
+
+#### Plink2
+* ver.2.0をbinaryでインストール
+
+```
+wget https://s3.amazonaws.com/plink2-assets/plink2_linux_x86_64_20211217.zip
+unzip plink2_linux_x86_64_20211217.zip
+```
 
 ---
 ---
@@ -611,6 +641,11 @@ pwd #現在のディレクトリを表示
 cp file1 file2 #file1をfile2としてコピー
 rm file1 #file1を削除
 mv file1 file2 #file1をfile2に移動（file１は消える）
+```
+ファイル圧縮解凍系
+```
+gzip input.fastq #input.fastqをgzに圧縮
+gzip -d input.fastq.gz #解凍
 ```
 ファイル表示系
 ```
