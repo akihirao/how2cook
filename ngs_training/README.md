@@ -54,9 +54,9 @@
 
 ### 2.1.1. シーケンスリードの取得
 
-酵母のリシーケンスの生リードデータ [SRR5678551](https://www.ncbi.nlm.nih.gov/sra/SRR5678551) (Illumina WGS of <i>Saccharomyces cerevisiae</i>: strain sake001)を公共データベースからダウンロードします。
+酵母のリシーケンスの生リードデータ [SRR5678551](https://www.ncbi.nlm.nih.gov/sra/SRR5678551) (Whole genome sequence of <i>Saccharomyces cerevisiae</i>: strain sake001)を公共データベースからダウンロードします。
 
-[SRR5678551](https://www.ncbi.nlm.nih.gov/sra/SRR5678551) のリンクからメタ情報をみると、illumina Hiseq 2000 で解読したペアエンド（一つのDNA断片に対し、5' 側と3' 側の両末端からシークエンスを読むことで２本で１ペアとなっているタイプ）のリードあることが分かります。
+[SRR5678551](https://www.ncbi.nlm.nih.gov/sra/SRR5678551) のメタ情報は、illumina Hiseq 2000 で解読したペアエンドリード（一つのDNA断片に対し、5'側と3'側の両末端から各々に読まれたシーケンスリードのペア）であることを示しています。
 
 ![](images/ngs_training_02.png)
 
