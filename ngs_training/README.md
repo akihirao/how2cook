@@ -13,50 +13,50 @@
 
 初心者向けのNGSデータ解析のチュートリアルです。公開NGSデータの取得から変異検出までの解析手順の流れについて、酵母のリシーケンス解析 (illuminaショートリード) を例に学びます。
 
+----
+## 目次
+#### 1. [はじめに](#はじめに)
+
+#### 2. [Single sample genotypingのワークフロー](#Single&nbsp;sample&nbsp;genotypingのワークフロー)
+　2.1. [公開データ取得](#公開データ取得)
+
+　2.2. [リードのクオリティーコントロール（QC）](#リードのクオリティーコントロール（QC）)
+
+　2.3. [マッピング](#マッピング)
+
+　2.4. [変異検出](#変異検出)
+
+#### 3. [Joint genotypingのワークフロー](#Joing&nbsp;genotypingのワークフロー)
+3. [公開データ取得から変異検出まで](#公開データ取得から変異検出まで)
 
 
-## 参考情報
-- Web
-  - [NGSハンズオン2015: ゲノムReseq、変異検出](https://www.iu.a.u-tokyo.ac.jp/~kadota/bioinfo_ngs_sokushu_2015/20150804_amelieff_20150902.pdf): (株)アメリエフ 山口昌男氏による講義資料
-  - [NGSデータから新たな知識を導出するためのデータ解析リテラシー](https://github.com/yuifu/ajacs68): 尾崎遼さんらの講義資料@AJACS68
-  - [macでインフォマティクス](https://kazumaxneo.hatenablog.com): 上坂一馬さんによるNGSツールなどの紹介
-  - [(Rで)塩基配列解析](http://www.iu.a.u-tokyo.ac.jp/~kadota/r_seq.html): 門田先生らによる充実サイト
-  - [統合TV（NGS解析だけでなくDBなども）](http://togotv.dbcls.jp)
-  - [Linux標準教科書](http://www.lpi.or.jp/linuxtext/text.shtml)
+#### 4. [その他](#その他)
 
+4. [ゲノムビューワーによる変異の視覚化](#ゲノムビューワーによる変異の視覚化)
 
-- 書籍
-  - [「入門者のLinux」(奈佐原顕郎著)](https://gendai.ismedia.jp/list/books/bluebacks/9784062579896):Linux初心者の方におすすめです
-
-
-- [よく使うシェルコマンド](#よく使うシェルコマンド)
-
----
-
-# リシーケンスのドライ解析のチュートリアル
-出芽酵母（ *Saccharomyces* *cerevisiae* ）は、真核生物として最初にゲノムが解読されたモデル生物です。ゲノムサイズ（12.1Mb）が小さいため、塩基配列データもコンパクトで扱いやすく、高スペックの計算機でなくてもデータ解析をおこなうことができます。酵母のリシーケンスを例題として、公開データの取得から変異検出までの解析処理の流れを学びます。なお解析環境として、Ubuntuマシンに[使用NGSツールのリスト](#使用NGSツールのリスト)がインストール済みであることを想定しています。
-
-## 本チュートリアルの流れ
-
-1. [公開データ取得](#公開データ取得)
-
-2. [リードのクオリティーコントロール（QC）](#リードのクオリティーコントロール（QC）)
-
-3. [マッピング](#マッピング)
-
-4. [変異検出](#変異検出)
-
-5. [ゲノムビューワーによる変異の視覚化](#ゲノムビューワーによる変異の視覚化)
 
 ![](images/ngs_training_01.png)
 
-<h2 id="公開データ取得">1.&nbsp;公開データ取得</h2>
+---
 
-### 1-1. シーケンスリードの取得
+## 1. はじめに
 
-酵母のリシーケンスの生リードデータ [ERR038793](https://www.ncbi.nlm.nih.gov/sra/ERR038793) を公共データベースからダウンロードします。
+出芽酵母（ *Saccharomyces* *cerevisiae* ）は、真核生物として最初にゲノムが解読されたモデル生物です。ゲノムサイズ（12.1Mb）が小さいため、塩基配列データもコンパクトで扱いやすく、高スペックの計算機でなくてもデータ解析をおこなうことができます。酵母のリシーケンスを例題として、公開データの取得から変異検出までの解析処理の流れを学びます。
 
-[ERR038793](https://www.ncbi.nlm.nih.gov/sra/ERR038793) のリンクからメタ情報をみると、illumina Hiseq 2000 で解読したペアエンドリードのデータであることが分かります。
+解析環境として、Ubuntuマシンに[使用NGSツールのリスト](#使用NGSツールのリスト)がインストール済みであることを想定しています。Macにおけるツール類の環境構築については、[こちら](https://kazumaxneo.hatenablog.com/entry/2019/10/16/122613)（上坂一馬さんのブログ） などを参考下さい。
+
+本チュートリアルでは、[GATKのgermline sort variant discoveryのワークフロー](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-)に基づいた変異検出法を紹介します。このワークフローには single sample genotyping と joint genotyping の２つのジェノタイピング方法があります。Single sample genotypingは１サンプルずつで処理するために、結果を逐次的に素早く取得することができます。一方で、joint genotypingはすべてのサンプルからの情報を活用して変異を検出するために、誤差が少なく高精度の推定法となります。しかしながら計算コストが増加することに加えて、サンプルが追加されるたびにjoing genotyping処理をやりなおすといった手間が必要になります。解析の目的や時間的制約に応じて、single sample genotyping と joint genotypingを使い分けるとよいでしょう。
+
+---
+## 2. Single sample genotypingのワークフロー
+
+<h2 id="公開データ取得">2.1.&nbsp;公開データ取得</h2>
+
+### 2.1.1. シーケンスリードの取得
+
+酵母のリシーケンスの生リードデータ [SRR5678551](https://www.ncbi.nlm.nih.gov/sra/SRR5678551) (Illumina WGS of <i>Saccharomyces cerevisiae</i>: strain sake001)を公共データベースからダウンロードします。
+
+[SRR5678551](https://www.ncbi.nlm.nih.gov/sra/SRR5678551) のリンクからメタ情報をみると、illumina Hiseq 2000 で解読したペアエンド（一つのDNA断片に対し、5' 側と3' 側の両末端からシークエンスを読むことで２本で１ペアとなっているタイプ）のリードあることが分かります。
 
 ![](images/ngs_training_02.png)
 
@@ -68,7 +68,7 @@ fastq_folder=$main_folder/fastq
 mkdir -p $fastq_folder
 cd $fastq_folder
 ```
-ブラウザからは直接fastq形式のリードデータをダウンロードすることはできません。そこでSRA-toolkitのfastq-dumpコマンドを使って、生リードデータ [ERR038793](https://www.ncbi.nlm.nih.gov/sra/ERR038793) を[DRA/SRA/ERAデータベース](https://www.ddbj.nig.ac.jp/dra/index.html)からダウンロードします。NGSツールを使う際には、解析の再現性担保のために、そのツールのバージョンを確認することが大切です。
+ブラウザからは直接fastq形式のリードデータをダウンロードすることはできません。そこでSRA-toolkitのfastq-dumpコマンドを使って、生リードデータ [SRR5678551](https://www.ncbi.nlm.nih.gov/sra/SRR5678551) を[DRA/SRA/ERAデータベース](https://www.ddbj.nig.ac.jp/dra/index.html)からダウンロードします。NGSツールを使う際には、解析の再現性担保のために、そのツールのバージョンを確認することが大切です。
 ```
 fastq-dump --version
 ```
@@ -85,13 +85,13 @@ Usage:
   fastq-dump [options] <accession>
 ...
 ```
-fastq-dumpコマンドにオプション--split-filesをつけて実行することで、ペアエンドのSRAデータ [ERR038793](https://www.ncbi.nlm.nih.gov/sra/ERR038793) は２つのfastqに分割して取得されます。
+fastq-dumpコマンドにオプション--split-filesをつけて実行することで、ペアエンドのSRAデータ [SRR5678551](https://www.ncbi.nlm.nih.gov/sra/SRR5678551) は２つのfastqに分割して取得されます。通信環境によってはダウンロードに時間がかかるかもしれません。
 ```
-fastq-dump --split-files ERR038793
+fastq-dump --split-files SRR5678551
 ```
-処理が済むと、RR038793_1.fastq とERR038793_2.fastqという２つのファイルが作成されます。ペアエンド１のRR038793_1.fastqを対象に冒頭部分を見てみましょう。
+処理が済むと、SRR5678551_1.fastq とSRR5678551_2.fastqという２つのファイルが作成されます。ペアエンド１のSRR5678551_1.fastqを対象に冒頭部分を見てみましょう。
 ```
-head ERR038793_1.fastq　#fastqの先頭部分を閲覧
+head SRR5678551_1.fastq　#fastqの先頭部分を閲覧
 ```
 ```
 @ERR038793.1 1 length=100
@@ -104,15 +104,20 @@ TGGTGGTATAAAGTGGTAGGGTAAGTATGTGTGTATTATTTACGATCATTTGTTAGCGTTTCAATATGGTGGGTAAAAAC
 ```
 Fastq形式について https://qiita.com/hayatak/items/0ab4f8bc3c051dd9a0d4
 
-次いでfastq/fasta操作ツールであるseqkitを用いて、ペアエンド１の概要を確認してみましょう。
+計算を軽くするためにリード数を2000000x2個だけ抽出した上でfastq.gzに圧縮します。さらにリードファイル名をアクセッション番号から酵母の系統名のsake001に変更しました。
 ```
-seqkit stats ERR038793_1.fastq　#seqkitはfasta/fastqの操作ツール
+head -n 8000000 SRR5678551_1.fastq | gzip > sake001_2M_1.fastq.gz
+head -n 8000000 SRR5678551_2.fastq | gzip > sake001_2M_2.fastq.gz
+```
+次いでfastq/fasta操作ツールであるseqkitを用いて、ペアエンド１のデータの概要を確認してみましょう。
+```
+seqkit stats sake001_2M_1.fastq.gz
 ```
 ```
-file    format  type  num_seqs      sum_len   min_len   avg_len   max_len
-ERR038793_1.fastq   FASTQ DNA 739,873 73,987,300  100 100 100
+file                   format  type   num_seqs      sum_len  min_len  avg_len  max_len
+sake001_2M_1.fastq.gz  FASTQ   DNA   2,000,000  188,000,000       94       94       94
 ```
-ペアエンド１は、リード長が100bp、リード数は739,873個で、総計73,987,300bpです。
+ペアエンド１は、リード数は2,000,000個で、総計188Mbpです。
 
 確認を終えたら、メインの作業フォルダに戻っておきましょう。
 
@@ -120,7 +125,7 @@ ERR038793_1.fastq   FASTQ DNA 739,873 73,987,300  100 100 100
 cd $main_folder　
 ```
 
-#### 1-2. 酵母のリファレンスゲノムの取得
+#### 2.1.2. 酵母のリファレンスゲノムの取得
 
 リファレンスゲノムの保存フォルダの準備
 ```
@@ -141,12 +146,12 @@ curl -O https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2
 #gzを展開
 gzip -d GCF_000146045.2_R64_genomic.fna.gz
 #コンパクトな名前に変更
-mv GCF_000146045.2_R64_genomic.fna ScerCer3.fa
+mv GCF_000146045.2_R64_genomic.fna sacCer3.fa
 ```
 リファレンスゲノムの中身確認
 ```
 #fasta形式の塩基配列ファイルの先頭部分を閲覧
-head ScerCer3.fa
+head sacCer3.fa
 ```
 ```
 >NC_001133.9 Saccharomyces cerevisiae S288C chromosome I, complete sequence
@@ -156,21 +161,21 @@ ACAGCCCTAATCTAACCCTGGCCAACCTGTCTCTCAACTTACCCTCCATTACCCTGCCTCCACTCGTTACCCTGTCCCAT
 ```
 リファレンスゲノムの概要チェック
 ```
-seqkit stats ScerCer3.fa　
+seqkit stats sacCer3.fa　
 ```
 ```
 file         format  type  num_seqs     sum_len  min_len    avg_len    max_len
-ScerCer3.fa  FASTA   DNA         17  12,157,105   85,779  715,123.8  1,531,933
+sacCer3.fa  FASTA   DNA         17  12,157,105   85,779  715,123.8  1,531,933
 ```
 ```
 cd $main_folder
 ```
 
-<h2 id="リードのクオリティーコントロール（QC）">2.&nbsp;リードのクオリティーコントロール（QC）</h2>
+<h2 id="リードのクオリティーコントロール（QC）">2.2.&nbsp;リードのクオリティーコントロール（QC）</h2>
 
 NGSから出力されるリードにはアダプター配列や低品質のリードが含まれている場合があります。データ前処理として、リードデータの品質を確認し、ノイズとなりそうなリードやアダプター配列、塩基を取り除いておきます。前者をリードクオリティーチェック、後者をリードフィルタリング(またはリードトリミング）と呼び、これらの一連の処理をクオリティーコントロール（Quality control: QC)と呼びます。
 
-#### 2-1. リードのクオリティーチェック
+#### 2.2.1. リードのクオリティーチェック
 
 FASTQファイルのクオリティを確認する代表的ツールがFastQCです。まずFastQCのバージョンを確認してみましょう。
 ```
@@ -191,14 +196,14 @@ fastqc seqfile1 seqfile2 .. seqfileN
 ```
 FastQCを実行すると、QCの結果がHTML形式でレポート出力されます。
 ```
-fastqc ERR038793_1.fastq ERR038793_2.fastq
+fastqc sake001_2M_1.fastq.gz sake001_2M_2.fastq.gz
 ```
-[上記のFastQC解析のレポート例](https://github.com/akihirao/how2cook/tree/main/ngs_training/ERR038793_1_fastqc.html)
+[上記のFastQC解析のレポート例](https://github.com/akihirao/how2cook/tree/main/ngs_training/sake001_2M_1_fastqc.html)
 
 FastQCのインストール、使い方、レポートの見方について https://bi.biopapyrus.jp/rnaseq/qc/fastqc.html
 
 
-#### 2-2. リードのクオリティーフィルタリング
+#### 2.2.2. リードのクオリティーフィルタリング
 
 次に低品質のリードや塩基を除去します。クオリティーのチェックからフィルタリングまでを一括して高速に処理してくれるQCツールfastpを使うことにします。ここでは平均でQ30未満のリードおよびリード長40bp未満を除去する設定を適用しますが、個々のデータに応じてフィルタリング設定を調整することが望ましいです。
 
@@ -207,21 +212,28 @@ fastpの使い方などについて　https://kazumaxneo.hatenablog.com/entry/20
 ```
 no_threads=3 #計算機環境に応じてスレッド数を指定
 cd $fastq_folder
-fastp -i ERR038793_1.fastq -I ERR038793_2.fastq -o ERR038793_1.trimmed.fastq -O ERR038793_2.trimmed.fastq -q 30 -l 40 -w $no_threads -h ERR038793.fastp.report.html
+fastp -i sake001_2M_1.fastq.gz -I sake001_2M_2.fastq.gz -o sake001_2M_1.trimmed.fastq.gz -O sake001_2M_2.trimmed.fastq.gz -f 5 -F 5 -q 30 -l 30 -w $no_threads -h sake001.fastp.report.html
+```
+```
+seqkit stats sake001_2M_1.trimmed.fastq.gz
+```
+```
+file                           format  type   num_seqs      sum_len  min_len  avg_len  max_len
+sake001_2M_1.trimmed.fastq.gz  FASTQ   DNA   1,852,803  164,869,458       31       89       89
 ```
 ```
 Read1 before filtering:
-total reads: 739873
-total bases: 73987300
-Q20 bases: 71492383(96.6279%)
-Q30 bases: 66616427(90.0377%)
+total reads: 2000000
+total bases: 188000000
+Q20 bases: 185671286(98.7613%)
+Q30 bases: 181213953(96.3904%)
 ...
-fastp v0.22.0, time used: 7 seconds
+fastp v0.12.4, time used: 31 seconds
 ```
 fastp処理が完了すると、フィルタリング前後の結果がHTML形式でレポートされます。レポートを確認して、以降の処理に進むべきか、それとも、フィルタリング設定を調整して再度QCをおこなうべきかを検討することが大事です。
 
 
-<h2 id="マッピング">3.&nbsp;マッピング</h2>
+<h2 id="マッピング">1.3.&nbsp;マッピング</h2>
 
 マッピングとは、シーケンサーから出てきた大量の塩基配列リードついて、参照ゲノム配列の中の該当する箇所を見つける処理です。
 
@@ -229,23 +241,23 @@ fastp処理が完了すると、フィルタリング前後の結果がHTML形�
 
 定番のマッピングツールであるbwaを使ってマッピングします。Bwaにはいくつかのアルゴリズがありますが、ここではbwa-memを使います。なおbwa-memアルゴリズムのネクストバーションが独立したツール [bwa-mem2](https://github.com/bwa-mem2/bwa-mem2) として公開されており、高速化に適しています（ただしメモリ使用量やインデックスサイズも大きくなるので、導入する際には留意して下さい）。
 
-#### 3-1. リファレンスのインデックス作成
+#### 2.3.1. リファレンスのインデックス作成
 
 まずリファレンス (参照配列) に対してインデックス（索引）を作成します。参照配列への高速な検索を図るために事前に索引を作るといった作業になります。
 ```
 cd $reference_folder
-bwa index ScerCer3.fa
+bwa index sacCer3.fa
 ```
 ```
 [bwa_index] Pack FASTA... 0.07 sec
 [bwa_index] Construct BWT for the packed sequence...
 ...
-[main] CMD: bwa index ScerCer3.fa
+[main] CMD: bwa index sacCer3.fa
 [main] Real time: 5.287 sec; CPU: 5.239 sec
 ```
 処理が済むと、*.amb、*.ann、*.bwt、*.pac というファイルが作成され、bwaが使用するインデックスとなります。
 
-#### 3-2. マッピング
+#### 2.3.2. マッピング
 
 マッピングの出力用フォルダを作成しておきます。
 ```
@@ -265,78 +277,78 @@ bwa memコマンドにてマッピングを実行します
 * gatk解析のためにオプション-Rでリードグループ(@RG)を指定しておきます。IDはその名のとおりID、SMはサンプル名、PLはシーケンスのプラットフォームに対応させます。gatkによるリードグループに関する解説は[こちら](https://gatk.broadinstitute.org/hc/en-us/articles/360035890671-Read-groups)
 
 ```
-bwa mem -t $no_threads -R "@RG\tID:ERR038793\tSM:ERR038793\tPL:Illumina" $reference_folder/ScerCer3.fa $fastq_folder/ERR038793_1.trimmed.fastq $fastq_folder/ERR038793_2.trimmed.fastq > ERR038793.sam
+bwa mem -t $no_threads -R "@RG\tID:sacCer\tSM:sake001\tPL:Illumina" $reference_folder/sacCer3.fa $fastq_folder/sake001_2M_1.trimmed.fastq.gz $fastq_folder/sake001_2M_2.trimmed.fastq.gz > sake001.sam
 ```
 マッピングで出力されたsam形式ファイルの中身を確認
 ```
-less ERR038793.sam
+less sake001.sam
 ```
 sam形式ファイルはテキストで記述されており、ヘッダーのメタ情報に続いて、各リードのアライメント（どこにマッピングされて、ミスマッチはいくつあったかなど）が１行毎に記載されています。
 ```
-@SQ     SN:NC_001133.9  LN:230218
-@SQ     SN:NC_001134.8  LN:813184
+@SQ     SN:chrI LN:230218
+@SQ     SN:chrII        LN:813184
 ...
 ...
-@SQ     SN:NC_001224.1  LN:85779
-@RG     ID:ERR038793    SM:ERR038793    PL:Illumina
-@PG     ID:bwa  PN:bwa  VN:0.7.17-r1198-dirty   CL:bwa mem -R @RG\tID:ERR038793\tSM:ERR038793\tPL:Illumina /home/akihirao/temp/Scer/reference/ScerCer3.fa /home/akihirao/temp/Scer/fastq/ERR038793_1.trimmed.fastq /home/akihirao/temp/Scer/fastq/ERR038793_2.trimmed.fastq
-ERR038793.3     99      NC_001133.9     90      60      100M    =       386     395     ATCTAACCCTGGCCAACCTGTTTCTCAACTTACCCTCCATTACCCTACCTCCACTCGTTACCCTGTCCCATTCAACCATACCACTCCGAACCACCATCCA    HHHHHHHHHHHGHHHHGHHBHHHHHHBFHHFDGGHHGHHBHHGHHBEHEFHFFHHFBEE=FFEFB@EFFEBEFECFBFFGHFGHFHFHH?HEHEGHEHFF    NM:i:2  MD:Z:21C24G53   MC:Z:67M7D25M8S AS:i:90 XS:i:55 RG:Z:ERR038793
-ERR038793.3     147     NC_001133.9     386     60      67M7D25M8S      =       90      -395    CCATGCCATAGTCACCCTCACTTGTATACTGATTTTACGTACGCACACGGATGCTACAGTATATACCACTTACCCTACTCTCATATTCCACTCCACACCC    ,?CCCEDECD?=8/?ED<BCGFFFGHFFHHGFGGGF=FEFEEEEADBDDCFCDEDCDDFFD@DC5CC;C@E;EGEFCF@GAFFDFECFFBD?GDAD?GDD    NM:i:10 MD:Z:0A9C56^ATCTCAA16G8 MC:Z:100M       AS:i:68 XS:i:53 RG:Z:ERR038793
+@SQ     SN:chrM LN:85779
+@RG     ID:sacCer       SM:sake001      PL:Illumina
+@PG     ID:bwa  PN:bwa  VN:0.7.17-r1188 CL:bwa mem -t 4 -R @RG\tID:sacCer\tSM:sake001\tPL:Illumina ScerCer3.fa sake001_2M_1.trimmed.fastq.gz sake001_2M_2.trimmed.fastq.gz
+SRR5678551.7    99      chrM    20497   60      89M     =       20729   321     ATAAAATGAACTATTTATTACCATTAATGATTGGAGCTACAGATACAGCATTTCCAAGAATTAATAACATTGCTTTTTGAGTATTACCT       HJJJIFIGGJJJGJJJJJIJJIJJIJIJJIJJJJIJJJJJIJJIJJJJIJJJJJJIJJIIGHJGHIJJHHHHHHFFFFBCDEEDEEDDC       NM:i:1  MD:Z:28A60      MC:Z:89M        AS:i:84 XS:i:0  RG:Z:SacCer
+SRR5678551.7    147     chrM    20729   60      89M     =       20497   -321    AATTTCATCATTATTAGGTGCTATTAATTTCATTGTAACAACATTAAATATGAGAACNNATGGTATGACAATGCATAAATTACCATTAT       ???????>=??????5?@@@@@@@@@@@@@@@@>@@@@@@@@@???????????=:0##???????????@@?@@??@??@????????       NM:i:2  MD:Z:57A0A30    MC:Z:89M        AS:i:85 XS:i:0  RG:Z:SacCer
 ...
 ```
 sam形式の解説　https://bi.biopapyrus.jp/format/sam.html
 
 samtoolsを使って、sam形式からバイナリータイプのbam形式に変換し、データサイズを圧縮しておきます。
 ```
-samtools view -@ $no_threads -Sb ERR038793.sam > ERR038793.bam
+samtools view -@ $no_threads -Sb sake001.sam > sake001.bam
 ```
 
 次いでbamをソートします。
 ```
-samtools sort -@ $no_threads ERR038793.bam > ERR038793.sorted.bam
+samtools sort -@ $no_threads sake001.bam > sake001.sorted.bam
 ```
 なお中間生成ファイルによるストレージの圧迫を避けるならば、次のようにパイプを使って bwa mem から samtools sort までの処理を一度におこなってもよいでしょう。
 ```
-#bwa mem -t $no_threads -R "@RG\tID:ERR038793\tSM:ERR038793\tPL:Illumina" $reference_folder/ScerCer3.fa $fastq_folder/ERR038793_1.trimmed.fastq $fastq_folder/ERR038793_2.trimmed.fastq | samtools view -@ $no_threads -Sb | samtools sort -@ $no_threads > ERR038793.sorted.bam
+#bwa mem -t $no_threads -R "@RG\tID:sacCer\tSM:sake001\tPL:Illumina" $reference_folder/sacCer3.fa $fastq_folder/sake001_2M_1.trimmed.fastq.gz $fastq_folder/sake001_2M_2.trimmed.fastq.gz | samtools view -@ $no_threads -Sb | samtools sort -@ $no_threads > sake001.sorted.bam
 ```
 出来上がった bam ファイルにもインデックスをつけておきます。
 ```
-samtools index ERR038793.sorted.bam
+samtools index sake001.sorted.bam
 
 ```
 bamtoolsを使って、マッピングの概要を確認します。
 ```
-bamtools stats -in ERR038793.sorted.bam
+bamtools stats -in sake001.sorted.bam
 ```
 ```
 **********************************************
 Stats for BAM file(s):
 **********************************************
 
-Total reads:       1258550
-Mapped reads:      1213020	(96.3823%)
-Forward strand:    651156	(51.7386%)
-Reverse strand:    607394	(48.2614%)
+Total reads:       3709750
+Mapped reads:      3688170	(99.4183%)
+Forward strand:    1864071	(50.2479%)
+Reverse strand:    1845679	(49.7521%)
 Failed QC:         0	(0%)
 Duplicates:        0	(0%)
-Paired-end reads:  1258550	(100%)
-'Proper-pairs':    1167167	(92.739%)
-Both pairs mapped: 1210760	(96.2028%)
-Read 1:            629162
-Read 2:            629388
-Singletons:        2260	(0.179572%)
+Paired-end reads:  3709750	(100%)
+'Proper-pairs':    3659100	(98.6347%)
+Both pairs mapped: 3685382	(99.3431%)
+Read 1:            1854841
+Read 2:            1854909
+Singletons:        2788	(0.0751533%)
 
 ```
 
 
-<h2 id="変異検出">4.&nbsp;変異検出</h2>
+<h2 id="変異検出">2.4.&nbsp;変異検出</h2>
 
 GATK (Genome Analysis toolkit)を使用して、BAMファイルから変異を検出します。
 
 まずリファレンス配列に対してGATK用のインデックスを作成しておきましょう。
 ```
-samtools faidx $reference_folder/ScerCer3.fa
-gatk CreateSequenceDictionary -R $reference_folder/ScerCer3.fa -O $reference_folder/ScerCer3.dict
+samtools faidx $reference_folder/sacCer3.fa
+gatk CreateSequenceDictionary -R $reference_folder/sacCer3.fa -O $reference_folder/sacCer3.dict
 ```
 vcf形式ファイルの出力用フォルダを作っておきます。
 ```
@@ -344,82 +356,70 @@ vcf_out_folder=$main_folder/vcf_out
 mkdir -p $vcf_out_folder
 ```
 
-#### 4-1. 前処理
+#### 2.4.1. 前処理
 
 シーケンスライブラリーの作成にPCRを使っている場合、マッピングされたリードの中に PCR duplication に由来する重複リードが含まれている可能性があります。このような重複リードはバリアントコールに偽陽性をもたらす可能性があるので、目印をつけておき（マーキング）、ダウンストリームで除去できるようにしておきます。なおゲノム縮約シーケンス（RAD-SeqやMig-Seq、GRAS-Di
 など）では、このような重複リードの除去は不必要です。
 ```
 cd $bwa_out_folder
-gatk MarkDuplicates -I $bwa_out_folder/ERR038793.sorted.bam -M $bwa_out_folder/ERR038793.metrics.txt -O $bwa_out_folder/ERR038793.markdup.bam
+gatk MarkDuplicates -I $bwa_out_folder/sake001.sorted.bam -M $bwa_out_folder/sake001.metrics.txt -O $bwa_out_folder/sake001.markdup.bam
 ```
 さらに複数箇所にマッピングされたリードも偽陽性の原因となるので、除去しておきます。
 ```
-samtools view -@ no_threads -b -q 4 $bwa_out_folder/ERR038793.markdup.bam > $bwa_out_folder/ERR038793.filtered.bam
-samtools index  -@ no_threads $bwa_out_folder/ERR038793.filtered.bam
+samtools view -@ no_threads -b -q 4 $bwa_out_folder/sake001.markdup.bam > $bwa_out_folder/sake001.filtered.bam
+samtools index  -@ no_threads $bwa_out_folder/sake001.filtered.bam
 ```
 
 前処理済みのbamファイルの概要を表示します。
 ```
-bamtools stats -in ERR038793.filtered.bam
+bamtools stats -in sake001.filtered.bam
 ```
 ```
 **********************************************
 Stats for BAM file(s):
 **********************************************
 
-**********************************************
-Stats for BAM file(s):
-**********************************************
-
-Total reads:       1120866
-Mapped reads:      1120866	(100%)
-Forward strand:    560599	(50.0148%)
-Reverse strand:    560267	(49.9852%)
+Total reads:       3234054
+Mapped reads:      3234054	(100%)
+Forward strand:    1617074	(50.0015%)
+Reverse strand:    1616980	(49.9985%)
 Failed QC:         0	(0%)
-Duplicates:        15838	(1.41301%)
-Paired-end reads:  1120866	(100%)
-'Proper-pairs':    1082195	(96.5499%)
-Both pairs mapped: 1118908	(99.8253%)
-Read 1:            560339
-Read 2:            560527
-Singletons:        1958	(0.174686%)
+Duplicates:        13391	(0.414062%)
+Paired-end reads:  3234054	(100%)
+'Proper-pairs':    3214405	(99.3924%)
+Both pairs mapped: 3232051	(99.9381%)
+Read 1:            1616993
+Read 2:            1617061
+Singletons:        2003	(0.0619346%)
 
 ```
 Duplicate リードが認識され、multiple mapping readsの除去によって、総リード数が減少したことが確認できます。
 
 これらの前処理に加えて、ヒトやマウスなどの生物では既知変異データをもとに塩基スコアを再計算してBAMファイルのクオリティーを補正すること(Base Quality Score Recalibration: BQSR)の有効性が示されていますが、本チュートリアルでは省略します。
 
-#### 4-2. バリアントコール
+#### 2.4.2. バリアントコール
 
 gatk HaplotypeCaller コマンドを使って、バリアントコールをおこないます。
 * gatk ver4.0以降の HaplotypeCaller では、アクティブ領域 (各塩基のエントロピーの計算に基づいてバリアントの存在が予想される領域) を検出し、局所アッセンブルを適用することで、SNPs/INDELの検出精度が向上するという工夫が施されています。
 
 ```
-gatk HaplotypeCaller -R $reference_folder/ScerCer3.fa -I $bwa_out_folder/ERR038793.filtered.bam --bam-output $bwa_out_folder/ERR038793.hpcall.bam -O $vcf_out_folder/ERR038793.raw.vcf
+gatk HaplotypeCaller -R $reference_folder/sacCer3.fa -I $bwa_out_folder/sake001.filtered.bam --bam-output $bwa_out_folder/sake001.hpcall.bam -O $vcf_out_folder/sake001.raw.vcf
 ```
 処理が済むとvcf形式のファイルが作られます。vcfファイルの中身を見てみましょう。
 ```
-less $vcf_out_folder/ERR038793.raw.vcf
+less $vcf_out_folder/sake001.raw.vcf
 ```
 ```
 ##fileformat=VCFv4.2
 ##FILTER=<ID=LowQual,Description="Low quality">
 ...
 ...
-##contig=<ID=NC_001224.1,length=85779>
 ##source=HaplotypeCaller
-#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  ERR038793
-NC_001133.9     111     .       C       T       328.64  .       AC=1;AF=0.500;AN=2;BaseQRankSum=-0.895;DP=24;ExcessHet=
-3.0103;FS=0.000;MLEAC=1;MLEAF=0.500;MQ=51.97;MQRankSum=0.167;QD=23.47;ReadPosRankSum=2.044;SOR=1.329     GT:AD:DP:GQ:PL
-  0/1:5,9:14:99:336,0,158
-NC_001133.9     136     .       G       A       616.06  .       AC=2;AF=1.00;AN=2;DP=28;ExcessHet=3.0103;FS=0.000;MLEAC
-=2;MLEAF=1.00;MQ=51.67;QD=25.36;SOR=5.421        GT:AD:DP:GQ:PL  1/1:0,14:14:42:630,42,0
-NC_001133.9     141     .       C       T       106.64  .       AC=1;AF=0.500;AN=2;BaseQRankSum=1.111;DP=27;ExcessHet=3
-.0103;FS=0.000;MLEAC=1;MLEAF=0.500;MQ=53.61;MQRankSum=-0.488;QD=6.66;ReadPosRankSum=2.004;SOR=0.527      GT:AD:DP:GQ:PL
-  0/1:12,4:16:99:114,0,413
-NC_001133.9     244     .       C       CT      185.61  .       AC=1;AF=0.500;AN=2;BaseQRankSum=-0.319;DP=11;ExcessHet=
-3.0103;FS=0.000;MLEAC=1;MLEAF=0.500;MQ=55.46;MQRankSum=-0.319;QD=23.20;ReadPosRankSum=1.534;SOR=2.833    GT:AD:DP:GQ:PL
-  0/1:1,7:8:19:193,0,19
+#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  sake001
+chrI    177     .       G       C       35.48   .       AC=2;AF=1.00;AN=2;DP=1;ExcessHet=3.0103;FS=0.000;MLEAC=1;MLEAF=0.500;MQ=34.00;QD=25.36;SOR=1.609        GT:AD:DP:GQ:PL  1/1:0,1:1:3:45,3,0
+chrI    181     .       C       T       35.48   .       AC=2;AF=1.00;AN=2;DP=1;ExcessHet=3.0103;FS=0.000;MLEAC=1;MLEAF=0.500;MQ=34.00;QD=28.73;SOR=1.609        GT:AD:DP:GQ:PL  1/1:0,1:1:3:45,3,0
+chrI    286     .       A       T       422.06  .       AC=2;AF=1.00;AN=2;DP=15;ExcessHet=3.0103;FS=0.000;MLEAC=2;MLEAF=1.00;MQ=43.78;QD=30.97;SOR=1.609        GT:AD:DP:GQ:PL  1/1:0,10:10:30:436,30,0
+chrI    290     .       A       T       249.64  .       AC=1;AF=0.500;AN=2;BaseQRankSum=1.440;DP=15;ExcessHet=3.0103;FS=3.233;MLEAC=1;MLEAF=0.500;MQ=43.78;MQRankSum=0.812;QD=24.96;ReadPosRankSum=0.769;SOR=0.093      GT:AD:DP:GQ:PL  0/1:3,7:10:78:257,0,78
 ...
 ```
 
@@ -427,18 +427,18 @@ vcf形式の解説　https://bi.biopapyrus.jp/gwas/vcf.html
 
 この段階のvcfファイルにはSNPsとINDELsの変異情報が記載されています。変異の総数を確認しましょう。
 ```
-awk '!/^#/' $vcf_out_folder/ERR038793.raw.vcf | wc -l
+awk '!/^#/' $vcf_out_folder/sake001.raw.vcf | wc -l
 ```
 ```
-69151
+74383
 ```
-計69151個の変異が検出されましたが、これらの中には偽陽性の可能性が高いものが含まれます。そこで次のステップでフィルタリングをおこないます。
+計74383個の変異が検出されましたが、これらの中には偽陽性の可能性が高いものが含まれます。そこで次のステップでフィルタリングをおこないます。
 
-#### 4-3. フィルタリング
+#### 2.4.3. フィルタリング
 
 上記のvcfファイルからSNPsの情報だけを取り出します。一般的にSNPsよりもINDELsの方が検出精度が低くなるため、それぞれを異なる閾値でフィルタリングすることが望ましいからです。
 ```
-gatk SelectVariants -R $reference_folder/ScerCer3.fa -V $vcf_out_folder/ERR038793.raw.vcf --select-type SNP -O $vcf_out_folder/ERR038793.snp.vcf
+gatk SelectVariants -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake001.raw.vcf --select-type SNP -O $vcf_out_folder/sake001.snp.vcf
 ```
 
 gatk VariantFiltrationコマンドでフィルタリングします。
@@ -450,29 +450,29 @@ gatk VariantFiltrationコマンドでフィルタリングします。
 * [gatkによる -filter/--filter-expression の解説](https://gatk.broadinstitute.org/hc/en-us/articles/360037434691-VariantFiltration#--filter-expression)
 
 ```
-gatk VariantFiltration -R $reference_folder/ScerCer3.fa -V $vcf_out_folder/ERR038793.snp.vcf --filter-expression "MQ < 40.0" --filter-name "MQ40" --filter-expression "QUAL < 30.0" --filter-name "QUAL30" -O $vcf_out_folder/ERR038793.snp.filtered.vcf
+gatk VariantFiltration -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake001.snp.vcf -filter "QD < 2.0" --filter-name "QD2" -filter "QUAL < 30.0" --filter-name "QUAL30" -filter "SOR > 3.0" --filter-name "SOR3" -filter "FS > 60.0" --filter-name "FS60" -filter "MQ < 40.0" --filter-name "MQ40" -filter "MQRankSum < -12.5" --filter-name "MQRankSum-12.5" -filter "ReadPosRankSum < -8.0" --filter-name "ReadPosRankSum-8" -O $vcf_out_folder/sake001.snp.filtered.vcf
 ```
 
 次いでvcfファイルのFORMAT fieldを対象としてサンプルベースのフィルタリング (オプション -G-filter) をおこないます。こちらも比較的シンプルな設定です。
 * [gatkによる -G-filter/--genotype-filter-expression の解説](https://gatk.broadinstitute.org/hc/en-us/articles/360037434691-VariantFiltration#--genotype-filter-expression)
 ```
-gatk VariantFiltration -R $reference_folder/ScerCer3.fa -V $vcf_out_folder/ERR038793.snp.filtered.vcf -G-filter "GQ < 20" -G-filter-name "GQ20" -G-filter "DP < 10" -G-filter-name "DP10" -O $vcf_out_folder/ERR038793.snp.DPfiltered.vcf
+gatk VariantFiltration -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake001.snp.filtered.vcf -G-filter "GQ < 20" -G-filter-name "GQ20" -G-filter "DP < 10" -G-filter-name "DP10" -O $vcf_out_folder/sake001.snp.DPfiltered.vcf
 ```
 
 フィルタリング後のSNPsの数を確認します。
 ```
-awk '!/^#/' $vcf_out_folder/ERR038793.snp.DPfiltered.vcf | wc -l
+awk '!/^#/' $vcf_out_folder/sake001.snp.DPfiltered.vcf | wc -l
 ```
 ```
-63195
+68329
 ```
-最終的に63195個のSNPsが検出されました。メインの作業フォルダに戻っておきましょう。
+最終的に68329個のSNPsが検出されました。メインの作業フォルダに戻っておきましょう。
 ```
 cd $main_folder
 ```
 以上で、本チュートリアルにおけるコマンドライン操作は全て終了です。
 
-<h2 id="ゲノムビューワーによる変異の視覚化">5.&nbsp;ゲノムビューワーによる変異の視覚化</h2>
+<h2 id="ゲノムビューワーによる変異の視覚化">1.5.&nbsp;ゲノムビューワーによる変異の視覚化</h2>
 
 [Integrated Genome Viewer (IGV)](https://software.broadinstitute.org/software/igv/)を使って、マッピングやバリアントコールの結果を視覚化してみましょう。
 
@@ -482,19 +482,35 @@ IGVの使い方について　https://bi.biopapyrus.jp/rnaseq/mapping/igv/
 
 ![](images/ngs_training_5_01.png)
 
-<h2 id="6. その他">6.&nbsp;その他</h2>
+<h2 id="Joint genotypingのワークフロー">3.&nbsp;Joint genotypingのワークフロー</h2>
 
-#### 複数サンプルからの変異検出について
+#### 複数サンプルにおける欠損データの取り扱いについて
 
-本チュートリアルでは1サンプルのみを対象として変異検出をおこなったので、single sample genotypingという方法を用いています。一方で、複数サンプルを対象とする場合は、すべてのサンプルをまとめてジェノタイピングする joint genotypingという方法がおすすめです。変異検出の精度が向上することが知られていますので、ぜひ適用を試みて下さい。
-* [gatkによるsingle sample genotypingと joint genotypingの解説](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-)
-
-そして複数サンプルを対象としてジェノタイピングをおこなうと、各々のサンプルによって遺伝子型が欠損するようなサイトがたびたび生じます。そのような欠損サイトの取扱や注意点いについて、ゲノム縮約シーケンスデータを対象とした岩崎貴也さんの次の講演資料が参考になります。
+複数サンプルを対象としてジェノタイピングをおこなうと、各々のサンプルによって遺伝子型が欠損するようなサイトがたびたび生じます。そのような欠損サイトの取扱や注意点いについて、ゲノム縮約シーケンスデータを対象とした岩崎貴也さんの次の講演資料が参考になります。
 
 * [NGSのSNPデータを集団遺伝解析に使う事の利点と欠点：非モデル生物の研究で気をつけることは？](https://drive.google.com/file/d/1UK04C1IbHGvosibPWjjbKT1t1pcaTR9-/view)
 
 ---
 [ページトップに戻る](https://github.com/akihirao/how2cook/tree/main/ngs_training#NGSデータ解析チュートリアル)
+
+---
+---
+
+## 参考情報
+- Web
+  - [NGSハンズオン2015: ゲノムReseq、変異検出](https://www.iu.a.u-tokyo.ac.jp/~kadota/bioinfo_ngs_sokushu_2015/20150804_amelieff_20150902.pdf): (株)アメリエフ 山口昌男氏による講義資料
+  - [NGSデータから新たな知識を導出するためのデータ解析リテラシー](https://github.com/yuifu/ajacs68): 尾崎遼さんらの講義資料@AJACS68
+  - [macでインフォマティクス](https://kazumaxneo.hatenablog.com): 上坂一馬さんによるNGSツールなどの紹介
+  - [(Rで)塩基配列解析](http://www.iu.a.u-tokyo.ac.jp/~kadota/r_seq.html): 門田先生らによる充実サイト
+  - [統合TV（NGS解析だけでなくDBなども）](http://togotv.dbcls.jp)
+  - [Linux標準教科書](http://www.lpi.or.jp/linuxtext/text.shtml)
+
+
+- 書籍
+  - [「入門者のLinux」(奈佐原顕郎著)](https://gendai.ismedia.jp/list/books/bluebacks/9784062579896):Linux初心者の方におすすめです
+
+
+- [よく使うシェルコマンド](#よく使うシェルコマンド)
 
 ---
 ---
@@ -559,15 +575,23 @@ cd bwa; make
 ```
 
 #### samtools: 2022/01/19時点の最新版はv1.14
-* htslibを含むソースからコンパイルする場合
+* HTSlib入りのソースからコンパイルする例です。
+* HTSlib projectの一部となったtabixとbgzipなどもよく使われるツールですので、HTSlibもビルドしておきましょう。
 
 ```
 cd /home/hogehoge/local
 wget https://github.com/samtools/samtools/releases/download/1.14/samtools-1.14.tar.bz2
 tar -xvf samtools-1.14.tar.bz2
 cd samtools-1.14
+./configure --prefix=/user/hogehoge/local/
+make
+./samtools --version
+cd htslib-1.14
 ./configure
 make
+./tabix --version
+./bgzip --version
+
 ```
 
 
