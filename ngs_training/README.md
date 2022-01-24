@@ -45,7 +45,7 @@
 
 本チュートリアルの解析環境は、Ubuntuマシンに[使用NGSツールのリスト](#使用NGSツールのリスト)がインストール済みであることを想定しています。Macにおけるツール類の環境構築については、[こちら](https://kazumaxneo.hatenablog.com/entry/2019/10/16/122613)（上坂一馬さんのブログ） などを参考にして下さい。
 
-変異検出のパイプラインは、[GATKのgermline sort variant discoveryのワークフロー](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-)に基づいています。このワークフローのジェノタイピングには single sample genotyping と joint genotyping の２つの方法があります。Single sample genotypingは１サンプルずつで処理するために、結果を逐次的に素早く取得することができます。一方で、joint genotypingはすべてのサンプルからの情報を活用して変異を検出するために、誤差が少なく高精度の推定法となります。しかしながら計算コストが増加することに加えて、サンプルが追加されるたびにjoing genotyping処理をやりなおすといった手間が必要になります。解析の目的や時間的制約に応じて、single sample genotyping と joint genotypingを使い分けるとよいでしょう。
+変異検出のパイプラインは、[GATKのgermline sort variant discoveryのワークフロー](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-)に基づいています。このワークフローのジェノタイピングには single sample genotyping と joint genotyping の２つの方法があります。Single sample genotypingは１サンプルずつで処理するために、結果を逐次的に素早く取得することができます。一方で、joint genotypingではすべてのサンプルからの情報を活用して変異を検出するために、誤差が少なく高精度の推定結果が得られます。しかしながら計算コストが増加することに加えて、サンプルが追加されるたびにjoing genotyping処理をやりなおすといった手間が必要になります。解析の目的や時間的制約に応じて、single sample genotyping と joint genotypingを使い分けるとよいでしょう。
 
 ---
 
@@ -86,7 +86,7 @@ Usage:
   fastq-dump [options] <accession>
 ...
 ```
-fastq-dumpコマンドにオプション--split-filesをつけて実行することで、ペアエンドのSRAデータ [SRR5678551](https://www.ncbi.nlm.nih.gov/sra/SRR5678551) は２つのfastqに分割して取得されます。通信環境によってはダウンロードに時間がかかるかもしれません。
+fastq-dumpコマンドにオプション--split-filesをつけて実行することで、ペアエンドのSRAデータ [SRR5678551](https://www.ncbi.nlm.nih.gov/sra/SRR5678551) は２つのfastqに分割して取得されます（通信環境によっては、ダウンロードに一時間以上かかるかもしれません。留意下さい）。
 ```
 fastq-dump --split-files SRR5678551
 ```
@@ -199,7 +199,8 @@ FastQCを実行すると、QCの結果がHTML形式でレポート出力され�
 ```
 fastqc sake001_2M_1.fastq.gz sake001_2M_2.fastq.gz
 ```
-[上記のFastQC解析のレポート例](https://github.com/akihirao/how2cook/tree/main/ngs_training/sake001_2M_1_fastqc.html)
+
+
 
 FastQCのインストール、使い方、レポートの見方について https://bi.biopapyrus.jp/rnaseq/qc/fastqc.html
 
@@ -441,42 +442,189 @@ awk '!/^#/' $vcf_out_folder/sake001.raw.vcf | wc -l
 ```
 gatk SelectVariants -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake001.raw.vcf --select-type SNP -O $vcf_out_folder/sake001.snp.vcf
 ```
+フィルタリング前のSNPsの個数を確認します。
+```
+awk '!/^#/' $vcf_out_folder/sake001.snp.vcf | wc -l
+```
+```
+68329
+```
+SNPsは68329個ありました。
 
 gatk VariantFiltrationコマンドでフィルタリングします。
 * [gatkによるフィルタリングのパラメーターと数値の意味の解説](https://gatk.broadinstitute.org/hc/en-us/articles/360035531112?id=6925)
 
 まずvcfファイルのINFO fieldを対象としてサイトベースの
-フィルタリング (オプション -filter-expression) をおこないます。。
-ここでは比較的シンプルな設定を適用します。
+フィルタリング (オプション -filter-expression) をおこないます。
 * [gatkによる -filter/--filter-expression の解説](https://gatk.broadinstitute.org/hc/en-us/articles/360037434691-VariantFiltration#--filter-expression)
 
 ```
-gatk VariantFiltration -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake001.snp.vcf -filter "QD < 2.0" --filter-name "QD2" -filter "QUAL < 30.0" --filter-name "QUAL30" -filter "SOR > 3.0" --filter-name "SOR3" -filter "FS > 60.0" --filter-name "FS60" -filter "MQ < 40.0" --filter-name "MQ40" -filter "MQRankSum < -12.5" --filter-name "MQRankSum-12.5" -filter "ReadPosRankSum < -8.0" --filter-name "ReadPosRankSum-8" -O $vcf_out_folder/sake001.snp.filtered.vcf
+#INFO filedを-filter-expressionの閾値でマーク
+gatk VariantFiltration -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake001.snp.vcf -filter "QD < 2.0" --filter-name "QD2" -filter "QUAL < 30.0" --filter-name "QUAL30" -filter "SOR > 3.0" --filter-name "SOR3" -filter "FS > 60.0" --filter-name "FS60" -filter "MQ < 40.0" --filter-name "MQ40" -filter "MQRankSum < -12.5" --filter-name "MQRankSum-12.5" -filter "ReadPosRankSum < -8.0" --filter-name "ReadPosRankSum-8" -O $vcf_out_folder/sake001.snp.filter.vcf
+
+#上記のコマンドでPASSしたサイトのみを抽出
+grep -E '^#|PASS' $vcf_out_folder/sake001.snp.filter.vcf  > $vcf_out_folder/sake001.snp.filterPASSED.vcf
 ```
 
-次いでvcfファイルのFORMAT fieldを対象としてサンプルベースのフィルタリング (オプション -G-filter) をおこないます。こちらも比較的シンプルな設定です。
+次いでvcfファイルのFORMAT fieldを対象としてサンプルベースのフィルタリング (オプション -G-filter) をおこないます。
+
 * [gatkによる -G-filter/--genotype-filter-expression の解説](https://gatk.broadinstitute.org/hc/en-us/articles/360037434691-VariantFiltration#--genotype-filter-expression)
-```
-gatk VariantFiltration -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake001.snp.filtered.vcf -G-filter "GQ < 20" -G-filter-name "GQ20" -G-filter "DP < 10" -G-filter-name "DP10" -O $vcf_out_folder/sake001.snp.DPfiltered.vcf
-```
 
+```
+#FORMAT filedを-G-filterの閾値でマーク
+gatk VariantFiltration -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake001.snp.filterPASSED.vcf -G-filter "GQ < 20" -G-filter-name "GQ20" -G-filter "DP < 10" -G-filter-name "DP10" -O $vcf_out_folder/sake001.snp.DPfilterPASSED.vcf
+
+#FORMAT fieldでマークされたジェノタイプを無効化
+gatk SelectVariants -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake001.snp.DPfilterPASSED.vcf --set-filtered-gt-to-nocall -O $vcf_out_folder/sake001.snp.DPfilterNoCall.vcf
+
+#複数のサンプルにおいて欠損率が高いサイトを除去
+gatk SelectVariants -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake001.snp.DPfilterNoCall.vcf --set-filtered-gt-to-nocall --max-nocall-fraction 0.99 --exclude-filtered -O $vcf_out_folder/sake001.snp.DPfilterNoCall.P99.vcf
+```
 フィルタリング後のSNPsの数を確認します。
 ```
-awk '!/^#/' $vcf_out_folder/sake001.snp.DPfiltered.vcf | wc -l
+awk '!/^#/' $vcf_out_folder/sake001.snp.DPfilterNoCall.P99.vcf | wc -l
 ```
 ```
-68329
+60909
 ```
-最終的に68329個のSNPsが検出されました。メインの作業フォルダに戻っておきましょう。
+フィルタリング後のSNPsは60,909個となりました。
+
+メインの作業フォルダに戻っておきましょう。
 ```
 cd $main_folder
 ```
-以上で、本チュートリアルにおけるコマンドライン操作は全て終了です。
 
 
 <h3 id="Joint&nbsp;genotypingのワークフロー">3.&nbsp;Joint genotypingのワークフロー</h3>
 
-##### 複数サンプルにおける欠損データの取り扱いについて
+Single sample genotypingの演習例で用いた酵母のサンプル[SRR5678551](https://www.ncbi.nlm.nih.gov/sra/SRR5678551)に加えて、２つのサンプル ([SRR5678548](https://www.ncbi.nlm.nih.gov/sra/SRR5678548), [SRR5678549](https://www.ncbi.nlm.nih.gov/sra/SRR5678549)  )を追加し、計３サンプルを対象としたワークフローを紹介します。以下のコマンド入力を試すにあたって、事前にフォルダへのパスなどの環境変数が有効になっていることを確認して下さい（リターンの結果が空ならば、再度、定義する必要があります）。
+```
+echo $fastq_folder
+echo $reference_folder
+echo $bwa_out_folder
+echo $vcf_out_folder
+echo $no_threads
+```
+#### 3.1. シーケンスリードの取得
+
+追加の２サンプルとして、酵母のリシーケンスの生リードデータ [SRR5678548](https://www.ncbi.nlm.nih.gov/sra/SRR5678548) と[SRR5678549](https://www.ncbi.nlm.nih.gov/sra/SRR5678549) を公共データベースからダウンロードします。
+```
+cd $fastq_folder
+fastq-dump --split files SRR5678548
+fastq-dump --split files SRR5678549
+```
+最初のサンプルと同様に、追加の２サンプルについても計算を軽くするためにリード数をペアあたり2000000x2個だけ抽出した上でfastq.gzに圧縮します(fastqはリード単位が４行で１セットなので、8000000行を抽出すると、2000000個分のリードとなります)。あわせてリードファイル名をアクセッション番号から酵母の系統名のsake002とsake003に変更します。
+```
+head -n 8000000 SRR5678548_1.fastq | gzip > sake002_2M_1.fastq.gz
+head -n 8000000 SRR5678548_2.fastq | gzip > sake002_2M_1_2M_2.fastq.gz
+head -n 8000000 SRR5678549_1.fastq | gzip > sake003_2M_1.fastq.gz
+head -n 8000000 SRR5678549_2.fastq | gzip > sake032_2M_1_2M_2.fastq.gz
+```
+
+#### 3.2. クオリティーコントロール
+
+fastpを使って追加2サンプルのクオリティーコントロールを行ないます。
+```
+fastp -i sake002_2M_1.fastq.gz -I sake002_2M_2.fastq.gz -o sake002_2M_1.trimmed.fastq.gz -O sake002_2M_2.trimmed.fastq.gz -f 5 -F 5 -q 30 -l 30 -w $no_threads -h sake002.fastp.report.html
+fastp -i sake003_2M_1.fastq.gz -I sake003_2M_2.fastq.gz -o sake003_2M_1.trimmed.fastq.gz -O sake003_2M_2.trimmed.fastq.gz -f 5 -F 5 -q 30 -l 30 -w $no_threads -h sake003.fastp.report.html
+```
+
+#### 3.3. マッピング
+
+bwaで追加2サンプルをマッピングします。
+```
+cd $bwa_out
+bwa mem -t $no_threads -R "@RG\tID:sacCer\tSM:sake002\tPL:Illumina" $reference_folder/sacCer3.fa $fastq_folder/sake002_2M_1.trimmed.fastq.gz $fastq_folder/sake002_2M_2.trimmed.fastq.gz | samtools view -@ $no_threads -Sb | samtools sort -@ $no_threads > sake002.sorted.bam
+samtools index sake002.sorted.bam
+bwa mem -t $no_threads -R "@RG\tID:sacCer\tSM:sake003\tPL:Illumina" $reference_folder/sacCer3.fa $fastq_folder/sake003_2M_1.trimmed.fastq.gz $fastq_folder/sake003_2M_2.trimmed.fastq.gz | samtools view -@ $no_threads -Sb | samtools sort -@ $no_threads > sake003.sorted.bam
+samtools index sake003.sorted.bam
+```
+
+#### 3.4. バリアントコール
+##### 3.4.1. 前処理
+2.4と同様に追加2サンプルを前処理をします。
+```
+cd $bwa_out_folder
+gatk MarkDuplicates -I $bwa_out_folder/sake002.sorted.bam -M $bwa_out_folder/sake002.metrics.txt -O $bwa_out_folder/sake002.markdup.bam
+gatk MarkDuplicates -I $bwa_out_folder/sake003.sorted.bam -M $bwa_out_folder/sake003.metrics.txt -O $bwa_out_folder/sake003.markdup.bam
+samtools view -@ no_threads -b -q 4 $bwa_out_folder/sake002.markdup.bam > $bwa_out_folder/sake002.filtered.bam
+samtools view -@ no_threads -b -q 4 $bwa_out_folder/sake003.markdup.bam > $bwa_out_folder/sake003.filtered.bam
+samtools index  -@ no_threads $bwa_out_folder/sake002.filtered.bam
+samtools index  -@ no_threads $bwa_out_folder/sake003.filtered.bam
+```
+
+##### 3.4.2. バリアントコール
+
+複数のサンプルを対象にgatk HaplotypeCallerコマンドにてハプロタイプ推定をおこないます。Joing genotyping法におけるHaplotypeCallerのオプション設定は、2.4.2で使用したものと異なることに注意して下さい。Joing genotyping法では、"--emit-ref-confidence GVCF" というオプションを付けることで、ジェノタイピング処理を完遂せずに途中で止めて中間結果を保存し、その後のデータベース用の素材とします。
+```
+gatk HaplotypeCaller -R $reference_folder/sacCer3.fa -I $bwa_out_folder/sake001.filtered.bam -O $vcf_out_folder/sake001.g.vcf.gz --emit-ref-confidence GVCF --bam-output $bwa_out_folder/sake001.g.hpcall.bam
+gatk HaplotypeCaller -R $reference_folder/sacCer3.fa -I $bwa_out_folder/sake002.filtered.bam -O $vcf_out_folder/sake002.g.vcf.gz --emit-ref-confidence GVCF --bam-output $bwa_out_folder/sake002.g.hpcall.bam
+gatk HaplotypeCaller -R $reference_folder/sacCer3.fa -I $bwa_out_folder/sake003.filtered.bam -O $vcf_out_folder/sake003.g.vcf.gz --emit-ref-confidence GVCF --bam-output $bwa_out_folder/sake003.g.hpcall.bam
+```
+続いて、中間ファイルをローカルデータベースにまとめます。
+```
+echo -e "chrI\nchrII\nchrIII\nchrIV\nchrIX\nchrV\nchrVI\nchrVII\nchrVIII\nchrX\nchrXI\nchrXII\nchrXIII\nchrXIV\nchrXVI\nchrM" > intervals.list
+gatk GenomicsDBImport -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake001.g.vcf.gz  -V $vcf_out_folder/sake002.g.vcf.gz  -V $vcf_out_folder/sake003.g.vcf.gz -L intervals.list --genomicsdb-workspace-path gDB
+```
+その上でgatk GenotypeGVCFsコマンドを用いてデータベースから３サンプルをまとめてジェノタイピングします。
+```
+gatk GenotypeGVCFs -R $reference_folder/sacCer3.fa -V gendb://gDB -O sake.3samples.raw.vcf.gz
+```
+##### 3.4.3. フィルタリング
+
+上記のvcf.gzファイルからSNPsの情報だけを切り出します。
+```
+gatk SelectVariants -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake.3samples.raw.vcf.gz --select-type SNP -O $vcf_out_folder/sake.3samples.snp.vcf.gz
+```
+フィルタリング前のSNPsの数を確認します。
+```
+gzip -dc $vcf_out_folder/sake.3samples.snp.vcf.gz | awk '!/^#/' | wc -l
+```
+```
+77387
+```
+
+vcfファイルのINFO fieldを対象としてサイトベースの
+フィルタリング (オプション -filter-expression) をおこないます。
+```
+#INFO filedを-filter-expressionの閾値でマーク
+gatk VariantFiltration -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake.3samples.snp.vcf.gz -filter "QD < 2.0" --filter-name "QD2" -filter "QUAL < 30.0" --filter-name "QUAL30" -filter "SOR > 3.0" --filter-name "SOR3" -filter "FS > 60.0" --filter-name "FS60" -filter "MQ < 40.0" --filter-name "MQ40" -filter "MQRankSum < -12.5" --filter-name "MQRankSum-12.5" -filter "ReadPosRankSum < -8.0" --filter-name "ReadPosRankSum-8" -O $vcf_out_folder/sake.3samples.snp.filter.vcf.gz
+
+#上記のコマンドでPASSしたサイトのみを抽出
+gzip -dc $vcf_out_folder/sake.3samples.snp.filter.vcf.gz | grep -E '^#|PASS' | bgzip > $vcf_out_folder/sake.3samples.snp.filterPASSED.vcf.gz
+
+#vdf.gzファイルのインデックス付
+tabix -f -p vcf $vcf_out_folder/sake.3samples.snp.filterPASSED.vcf.gz
+```
+
+次いでvcfファイルのFORMAT fieldを対象としてサンプルベースのフィルタリング (オプション -G-filter) をおこないます。
+```
+#FORMAT filedをG-filterの閾値でマーク
+gatk VariantFiltration -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake.3samples.snp.filterPASSED.vcf.gz -G-filter "GQ < 20" -G-filter-name "GQ20" -G-filter "DP < 10" -G-filter-name "DP10" -O $vcf_out_folder/sake.3samples.snp.DPfilterPASSED.vcf.gz
+
+#FORMAT fieldでマークされたジェノタイプを無効化
+gatk SelectVariants -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake.3samples.snp.DPfilterPASSED.vcf.gz --set-filtered-gt-to-nocall -O $vcf_out_folder/sake.3samples.snp.DPfilterNoCall.vcf.gz
+
+#複数のサンプルにおいて欠損率が高いサイトを除去
+gatk SelectVariants -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake.3samples.snp.DPfilterNoCall.vcf.gz --set-filtered-gt-to-nocall --max-nocall-fraction 0.99 --exclude-filtered -O $vcf_out_folder/sake.3samples.snp.DPfilterNoCall.P99.vcf.gz
+```
+フィルタリング後のSNPsの数を確認します。
+```
+gzip -dc $vcf_out_folder/sake.3samples.snp.DPfilterNoCall.P99.vcf.gz | awk '!/^#/' | wc -l
+```
+```
+71148
+```
+フィルタリング後に３つのサンプルから計71,148個のSNPsが同定されました。
+```
+cd $main_folder
+```
+これで本チュートリアルにおけるコマンド操作はすべて完了です。
+
+おつかれさまでした!！
+
+
+##### 補足：複数サンプルにおける欠損データの取り扱いについて
 
 複数サンプルを対象としてジェノタイピングをおこなうと、各々のサンプルによって遺伝子型が欠損するようなサイトがたびたび生じます。そのような欠損サイトの取扱や注意点いについて、ゲノム縮約シーケンスデータを対象とした岩崎貴也さんの次の講演資料が参考になります。
 
