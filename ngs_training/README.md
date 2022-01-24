@@ -9,15 +9,15 @@
 
 ----
 
-## 概要
+# 概要
 
 初心者向けのNGSデータ解析のチュートリアルです。公開NGSデータの取得から変異検出までの解析手順の流れについて、酵母のリシーケンス解析 (illuminaショートリード) を例に学びます。
 
 ----
-## 目次
-#### 1. [はじめに](#はじめに)
+# 目次
+### 1. [はじめに](#はじめに)
 
-#### 2. [Single&nbsp;sample&nbsp;genotypingのワークフロー](#Single&nbsp;sample&nbsp;genotypingのワークフロー)
+### 2. [Single&nbsp;sample&nbsp;genotypingのワークフロー](#Single&nbsp;sample&nbsp;genotypingのワークフロー)
 　2.1. [公開データ取得](#公開データ取得)
 
 　2.2. [リードのクオリティーコントロール（QC）](#リードのクオリティーコントロール（QC）)
@@ -26,34 +26,34 @@
 
 　2.4. [変異検出](#変異検出)
 
-#### 3. [Joint genotypingのワークフロー](#Joing&nbsp;genotypingのワークフロー)
-3. [公開データ取得から変異検出まで](#公開データ取得から変異検出まで)
+### 3. [Joint genotypingのワークフロー](#Joing&nbsp;genotypingのワークフロー)
+3.1 [公開データ取得から変異検出まで](#公開データ取得から変異検出まで)
 
 
-#### 4. [その他](#その他)
+### 4. [その他](#その他)
 
-4. [ゲノムビューワーによる変異の視覚化](#ゲノムビューワーによる変異の視覚化)
+4.1 [ゲノムビューワーによる変異の視覚化](#ゲノムビューワーによる変異の視覚化)
 
 
 ![](images/ngs_training_01.png)
 
 ---
 
-<h2 id="はじめに">1.&nbsp;はじめに</h2>
+<h1 id="はじめに">1.&nbsp;はじめに</h1>
 
 出芽酵母（ *Saccharomyces* *cerevisiae* ）は、真核生物として最初にゲノムが解読されたモデル生物です。ゲノムサイズ（12.1Mb）が小さいため、塩基配列データもコンパクトで扱いやすく、高スペックの計算機でなくてもデータ解析をおこなうことができます。酵母のリシーケンスを例題として、公開データの取得から変異検出までの解析処理の流れを学びます。
 
-本チュートリアルの解析環境は、Ubuntuマシンに[使用NGSツールのリスト](#使用NGSツールのリスト)がインストール済みであることを想定しています。Macにおけるツール類の環境構築については、[こちら](https://kazumaxneo.hatenablog.com/entry/2019/10/16/122613)（上坂一馬さんのブログ） などを参考にして下さい。
+本チュートリアルの解析環境は、Ubuntuマシンに[使用NGSツールのリスト](#使用NGSツールのリスト)がインストール済みであることを想定しています。Macにおけるツール類の環境構築については、[上坂一馬さんのブログ](https://kazumaxneo.hatenablog.com/entry/2019/10/16/122613) が参考になります。
 
 変異検出のパイプラインは、[GATKのgermline sort variant discoveryのワークフロー](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-)に基づいています。このワークフローのジェノタイピングには single sample genotyping と joint genotyping の２つの方法があります。Single sample genotypingは１サンプルずつで処理するために、結果を逐次的に素早く取得することができます。一方で、joint genotypingではすべてのサンプルからの情報を活用して変異を検出するために、誤差が少なく高精度の推定結果が得られます。しかしながら計算コストが増加することに加えて、サンプルが追加されるたびにjoing genotyping処理をやりなおすといった手間が必要になります。解析の目的や時間的制約に応じて、single sample genotyping と joint genotypingを使い分けるとよいでしょう。
 
 ---
 
-<h2 id="Single&nbsp;sample&nbsp;genotyping">2.&nbsp;Single&nbsp;sample&nbsp;genotypingのワークフロー</h2>
+<h1 id="Single&nbsp;sample&nbsp;genotyping">2.&nbsp;Single&nbsp;sample&nbsp;genotypingのワークフロー</h1>
 
-<h3 id="公開データ取得">2.1.&nbsp;公開データ取得</h3>
+<h2 id="公開データ取得">2.1.&nbsp;公開データ取得</h2>
 
-#### 2.1.1. シーケンスリードの取得
+### 2.1.1. シーケンスリードの取得
 
 酵母のリシーケンスの生リードデータ [SRR5678551](https://www.ncbi.nlm.nih.gov/sra/SRR5678551) (Whole genome sequence of <i>Saccharomyces cerevisiae</i>: strain sake001)を公共データベースからダウンロードします。
 
@@ -126,7 +126,7 @@ sake001_2M_1.fastq.gz  FASTQ   DNA   2,000,000  188,000,000       94       94   
 cd $main_folder　
 ```
 
-##### 2.1.2. 酵母のリファレンスゲノムの取得
+#### 2.1.2. 酵母のリファレンスゲノムの取得
 
 リファレンスゲノムの保存フォルダの準備
 ```
@@ -172,11 +172,11 @@ sacCer3.fa  FASTA   DNA         17  12,157,105   85,779  715,123.8  1,531,933
 cd $main_folder
 ```
 
-<h3 id="リードのクオリティーコントロール（QC）">2.2.&nbsp;リードのクオリティーコントロール（QC）</h3>
+<h2 id="リードのクオリティーコントロール（QC）">2.2.&nbsp;リードのクオリティーコントロール（QC）</h2>
 
 NGSから出力されるリードにはアダプター配列や低品質のリードが含まれている場合があります。データ前処理として、リードデータの品質を確認し、ノイズとなりそうなリードやアダプター配列、塩基を取り除いておきます。前者をリードクオリティーチェック、後者をリードフィルタリング(またはリードトリミング）と呼び、これらの一連の処理をクオリティーコントロール（Quality control: QC)と呼びます。
 
-##### 2.2.1. リードのクオリティーチェック
+#### 2.2.1. リードのクオリティーチェック
 
 FASTQファイルのクオリティを確認する代表的ツールがFastQCです。まずFastQCのバージョンを確認してみましょう。
 ```
@@ -205,7 +205,7 @@ fastqc sake001_2M_1.fastq.gz sake001_2M_2.fastq.gz
 FastQCのインストール、使い方、レポートの見方について https://bi.biopapyrus.jp/rnaseq/qc/fastqc.html
 
 
-##### 2.2.2. リードのクオリティーフィルタリング
+#### 2.2.2. リードのクオリティーフィルタリング
 
 次に低品質のリードや塩基を除去します。クオリティーのチェックからフィルタリングまでを一括して高速に処理してくれるQCツールfastpを使うことにします。ここでは平均でQ30未満のリードおよびリード長40bp未満を除去する設定を適用しますが、個々のデータに応じてフィルタリング設定を調整することが望ましいです。
 
@@ -243,7 +243,7 @@ fastp処理が完了すると、フィルタリング前後の結果がHTML形�
 
 定番のマッピングツールであるbwaを使ってマッピングします。Bwaにはいくつかのアルゴリズがありますが、ここではbwa-memを使います。なおbwa-memアルゴリズムのネクストバーションが独立したツール [bwa-mem2](https://github.com/bwa-mem2/bwa-mem2) として公開されており、高速化に適しています（ただしメモリ使用量やインデックスサイズも大きくなるので、導入する際には留意して下さい）。
 
-##### 2.3.1. リファレンスのインデックス作成
+#### 2.3.1. リファレンスのインデックス作成
 
 まずリファレンス (参照配列) に対してインデックス（索引）を作成します。参照配列への高速な検索を図るために事前に索引を作るといった作業になります。
 ```
@@ -259,7 +259,7 @@ bwa index sacCer3.fa
 ```
 処理が済むと、*.amb、*.ann、*.bwt、*.pac というファイルが作成され、bwaが使用するインデックスとなります。
 
-##### 2.3.2. マッピング
+#### 2.3.2. マッピング
 
 マッピングの出力用フォルダを作成しておきます。
 ```
@@ -343,7 +343,7 @@ Singletons:        2788	(0.0751533%)
 ```
 
 
-<h3 id="変異検出">2.4.&nbsp;変異検出</h3>
+<h2 id="変異検出">2.4.&nbsp;変異検出</h2>
 
 GATK (Genome Analysis toolkit)を使用して、BAMファイルから変異を検出します。
 
@@ -358,7 +358,7 @@ vcf_out_folder=$main_folder/vcf_out
 mkdir -p $vcf_out_folder
 ```
 
-##### 2.4.1. 前処理
+#### 2.4.1. 前処理
 
 シーケンスライブラリーの作成にPCRを使っている場合、マッピングされたリードの中に PCR duplication に由来する重複リードが含まれている可能性があります。このような重複リードはバリアントコールに偽陽性をもたらす可能性があるので、目印をつけておき（マーキング）、ダウンストリームで除去できるようにしておきます。なおゲノム縮約シーケンス（RAD-SeqやMig-Seq、GRAS-Di
 など）では、このような重複リードの除去は不必要です。
@@ -399,7 +399,7 @@ Duplicate リードが認識され、multiple mapping readsの除去によって
 
 これらの前処理に加えて、ヒトやマウスなどの生物では既知変異データをもとに塩基スコアを再計算してBAMファイルのクオリティーを補正すること(Base Quality Score Recalibration: BQSR)の有効性が示されていますが、本チュートリアルでは省略します。
 
-##### 2.4.2. バリアントコール
+#### 2.4.2. バリアントコール
 
 gatk HaplotypeCaller コマンドを使って、バリアントコールをおこないます。
 * gatk ver4.0以降の HaplotypeCaller では、アクティブ領域 (各塩基のエントロピーの計算に基づいてバリアントの存在が予想される領域) を検出し、局所アッセンブルを適用することで、SNPs/INDELの検出精度が向上するという工夫が施されています。
@@ -436,7 +436,7 @@ awk '!/^#/' $vcf_out_folder/sake001.raw.vcf | wc -l
 ```
 計74383個の変異が検出されましたが、これらの中には偽陽性の可能性が高いものが含まれます。そこで次のステップでフィルタリングをおこないます。
 
-##### 2.4.3. フィルタリング
+#### 2.4.3. フィルタリング
 
 上記のvcfファイルからSNPsの情報だけを取り出します。一般的にSNPsよりもINDELsの方が検出精度が低くなるため、それぞれを異なる閾値でフィルタリングすることが望ましいからです。
 ```
@@ -495,7 +495,7 @@ cd $main_folder
 ```
 
 
-<h3 id="Joint&nbsp;genotypingのワークフロー">3.&nbsp;Joint genotypingのワークフロー</h3>
+<h2 id="Joint&nbsp;genotypingのワークフロー">3.&nbsp;Joint genotypingのワークフロー</h2>
 
 Single sample genotypingの演習例で用いた酵母のサンプル[SRR5678551](https://www.ncbi.nlm.nih.gov/sra/SRR5678551)に加えて、２つのサンプル ([SRR5678548](https://www.ncbi.nlm.nih.gov/sra/SRR5678548), [SRR5678549](https://www.ncbi.nlm.nih.gov/sra/SRR5678549)  )を追加し、計３サンプルを対象としたワークフローを紹介します。以下のコマンド入力を試すにあたって、事前にフォルダへのパスなどの環境変数が有効になっていることを確認して下さい（リターンの結果が空ならば、再度、定義する必要があります）。
 ```
@@ -505,7 +505,7 @@ echo $bwa_out_folder
 echo $vcf_out_folder
 echo $no_threads
 ```
-#### 3.1. シーケンスリードの取得
+### 3.1. シーケンスリードの取得
 
 追加の２サンプルとして、酵母のリシーケンスの生リードデータ [SRR5678548](https://www.ncbi.nlm.nih.gov/sra/SRR5678548) と[SRR5678549](https://www.ncbi.nlm.nih.gov/sra/SRR5678549) を公共データベースからダウンロードします。
 ```
@@ -521,7 +521,7 @@ head -n 8000000 SRR5678549_1.fastq | gzip > sake003_2M_1.fastq.gz
 head -n 8000000 SRR5678549_2.fastq | gzip > sake032_2M_1_2M_2.fastq.gz
 ```
 
-#### 3.2. クオリティーコントロール
+### 3.2. クオリティーコントロール
 
 fastpを使って追加2サンプルのクオリティーコントロールを行ないます。
 ```
@@ -529,7 +529,7 @@ fastp -i sake002_2M_1.fastq.gz -I sake002_2M_2.fastq.gz -o sake002_2M_1.trimmed.
 fastp -i sake003_2M_1.fastq.gz -I sake003_2M_2.fastq.gz -o sake003_2M_1.trimmed.fastq.gz -O sake003_2M_2.trimmed.fastq.gz -f 5 -F 5 -q 30 -l 30 -w $no_threads -h sake003.fastp.report.html
 ```
 
-#### 3.3. マッピング
+### 3.3. マッピング
 
 bwaで追加2サンプルをマッピングします。
 ```
@@ -540,8 +540,8 @@ bwa mem -t $no_threads -R "@RG\tID:sacCer\tSM:sake003\tPL:Illumina" $reference_f
 samtools index sake003.sorted.bam
 ```
 
-#### 3.4. バリアントコール
-##### 3.4.1. 前処理
+### 3.4. バリアントコール
+#### 3.4.1. 前処理
 2.4と同様に追加2サンプルを前処理をします。
 ```
 cd $bwa_out_folder
@@ -553,7 +553,7 @@ samtools index  -@ no_threads $bwa_out_folder/sake002.filtered.bam
 samtools index  -@ no_threads $bwa_out_folder/sake003.filtered.bam
 ```
 
-##### 3.4.2. バリアントコール
+#### 3.4.2. バリアントコール
 
 複数のサンプルを対象にgatk HaplotypeCallerコマンドにてハプロタイプ推定をおこないます。Joing genotyping法におけるHaplotypeCallerのオプション設定は、2.4.2で使用したものと異なることに注意して下さい。Joing genotyping法では、"--emit-ref-confidence GVCF" というオプションを付けることで、ジェノタイピング処理を完遂せずに途中で止めて中間結果を保存し、その後のデータベース用の素材とします。
 ```
@@ -570,7 +570,7 @@ gatk GenomicsDBImport -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake001
 ```
 gatk GenotypeGVCFs -R $reference_folder/sacCer3.fa -V gendb://gDB -O sake.3samples.raw.vcf.gz
 ```
-##### 3.4.3. フィルタリング
+#### 3.4.3. フィルタリング
 
 上記のvcf.gzファイルからSNPsの情報だけを切り出します。
 ```
@@ -604,8 +604,15 @@ gatk VariantFiltration -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake.3
 
 #FORMAT fieldでマークされたジェノタイプを無効化
 gatk SelectVariants -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake.3samples.snp.DPfilterPASSED.vcf.gz --set-filtered-gt-to-nocall -O $vcf_out_folder/sake.3samples.snp.DPfilterNoCall.vcf.gz
+```
 
-#複数のサンプルにおいて欠損率が高いサイトを除去
+複数サンプルを対象としてジェノタイピングをおこなうと、各々のサンプルによって遺伝子型が欠損するようなサイトがたびたび生じます。そのような欠損サイトの取扱や注意点いについて、ゲノム縮約シーケンスデータを対象とした岩崎貴也さんの次の講演資料が参考になります。
+
+* [NGSのSNPデータを集団遺伝解析に使う事の利点と欠点：非モデル生物の研究で気をつけることは？](https://drive.google.com/file/d/1UK04C1IbHGvosibPWjjbKT1t1pcaTR9-/view)
+
+本チュートリアルでは、（極端な例ですが）欠損率1%未満のサイトのみを取り出すこととします。
+```
+#複数のサンプル間で欠損率1%未満のサイトのみを抽出
 gatk SelectVariants -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake.3samples.snp.DPfilterNoCall.vcf.gz --set-filtered-gt-to-nocall --max-nocall-fraction 0.99 --exclude-filtered -O $vcf_out_folder/sake.3samples.snp.DPfilterNoCall.P99.vcf.gz
 ```
 フィルタリング後のSNPsの数を確認します。
@@ -615,20 +622,13 @@ gzip -dc $vcf_out_folder/sake.3samples.snp.DPfilterNoCall.P99.vcf.gz | awk '!/^#
 ```
 71148
 ```
-フィルタリング後に３つのサンプルから計71,148個のSNPsが同定されました。
+フィルタリング後に計71,148個のSNPsが同定されました。
 ```
 cd $main_folder
 ```
 これで本チュートリアルにおけるコマンド操作はすべて完了です。
 
 おつかれさまでした!！
-
-
-##### 補足：複数サンプルにおける欠損データの取り扱いについて
-
-複数サンプルを対象としてジェノタイピングをおこなうと、各々のサンプルによって遺伝子型が欠損するようなサイトがたびたび生じます。そのような欠損サイトの取扱や注意点いについて、ゲノム縮約シーケンスデータを対象とした岩崎貴也さんの次の講演資料が参考になります。
-
-* [NGSのSNPデータを集団遺伝解析に使う事の利点と欠点：非モデル生物の研究で気をつけることは？](https://drive.google.com/file/d/1UK04C1IbHGvosibPWjjbKT1t1pcaTR9-/view)
 
 
 <h2 id="その他">4.&nbsp;その他</h2>
@@ -726,8 +726,7 @@ cd bwa; make
 ```
 
 #### samtools: 2022/01/19時点の最新版はv1.14
-* HTSlib入りのソースからコンパイルする例です。
-* HTSlib projectの一部となったtabixとbgzipなどもよく使われるツールですので、HTSlibもビルドしておきましょう。
+HTSlib入りのソースからコンパイルする例です。HTSlib projectの一部であるtabixとbgzipは使用頻度の高いツールなので、HTSlibもビルドしておきましょう。
 
 ```
 cd /home/hogehoge/local
@@ -745,7 +744,7 @@ make
 
 ```
 #### Trimmomatic
-* ver.0.39をbinaryでインストール
+Ver.0.39をbinaryでインストール
 
 ```
 wget http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.39.zip
@@ -756,7 +755,7 @@ ls
 ```
 
 #### Plink
-* ver.1.9をbinaryでインストール
+Ver.1.9をbinaryでインストール
 
 ```
 wget https://s3.amazonaws.com/plink1-assets/plink_linux_x86_64_20210606.zip
@@ -764,7 +763,7 @@ unzip plink_linux_x86_64_20210606.zip
 ```
 
 #### Plink2
-* ver.2.0をbinaryでインストール
+Ver.2.0をbinaryでインストール
 
 ```
 wget https://s3.amazonaws.com/plink2-assets/plink2_linux_x86_64_20211217.zip
