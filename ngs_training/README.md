@@ -49,6 +49,7 @@
 
 ---
 
+
 <h1 id="Single&nbsp;sample&nbsp;genotyping">2.&nbsp;Single&nbsp;sample&nbsp;genotypingのワークフロー</h1>
 
 <h2 id="公開データ取得">2.1.&nbsp;公開データ取得</h2>
@@ -126,7 +127,7 @@ sake001_2M_1.fastq.gz  FASTQ   DNA   2,000,000  188,000,000       94       94   
 cd $main_folder　
 ```
 
-#### 2.1.2. 酵母のリファレンスゲノムの取得
+### 2.1.2. 酵母のリファレンスゲノムの取得
 
 リファレンスゲノムの保存フォルダの準備
 ```
@@ -176,7 +177,7 @@ cd $main_folder
 
 NGSから出力されるリードにはアダプター配列や低品質のリードが含まれている場合があります。データ前処理として、リードデータの品質を確認し、ノイズとなりそうなリードやアダプター配列、塩基を取り除いておきます。前者をリードクオリティーチェック、後者をリードフィルタリング(またはリードトリミング）と呼び、これらの一連の処理をクオリティーコントロール（Quality control: QC)と呼びます。
 
-#### 2.2.1. リードのクオリティーチェック
+### 2.2.1. リードのクオリティーチェック
 
 FASTQファイルのクオリティを確認する代表的ツールがFastQCです。まずFastQCのバージョンを確認してみましょう。
 ```
@@ -205,7 +206,7 @@ fastqc sake001_2M_1.fastq.gz sake001_2M_2.fastq.gz
 FastQCのインストール、使い方、レポートの見方について https://bi.biopapyrus.jp/rnaseq/qc/fastqc.html
 
 
-#### 2.2.2. リードのクオリティーフィルタリング
+### 2.2.2. リードのクオリティーフィルタリング
 
 次に低品質のリードや塩基を除去します。クオリティーのチェックからフィルタリングまでを一括して高速に処理してくれるQCツールfastpを使うことにします。ここでは平均でQ30未満のリードおよびリード長40bp未満を除去する設定を適用しますが、個々のデータに応じてフィルタリング設定を調整することが望ましいです。
 
@@ -235,7 +236,7 @@ fastp v0.12.4, time used: 31 seconds
 fastp処理が完了すると、フィルタリング前後の結果がHTML形式でレポートされます。レポートを確認して、以降の処理に進むべきか、それとも、フィルタリング設定を調整して再度QCをおこなうべきかを検討することが大事です。
 
 
-<h3 id="マッピング">2.3.&nbsp;マッピング</h3>
+<h2 id="マッピング">2.3.&nbsp;マッピング</h2>
 
 マッピングとは、シーケンサーから出てきた大量の塩基配列リードついて、参照ゲノム配列の中の該当する箇所を見つける処理です。
 
@@ -243,7 +244,7 @@ fastp処理が完了すると、フィルタリング前後の結果がHTML形�
 
 定番のマッピングツールであるbwaを使ってマッピングします。Bwaにはいくつかのアルゴリズがありますが、ここではbwa-memを使います。なおbwa-memアルゴリズムのネクストバーションが独立したツール [bwa-mem2](https://github.com/bwa-mem2/bwa-mem2) として公開されており、高速化に適しています（ただしメモリ使用量やインデックスサイズも大きくなるので、導入する際には留意して下さい）。
 
-#### 2.3.1. リファレンスのインデックス作成
+### 2.3.1. リファレンスのインデックス作成
 
 まずリファレンス (参照配列) に対してインデックス（索引）を作成します。参照配列への高速な検索を図るために事前に索引を作るといった作業になります。
 ```
@@ -259,7 +260,7 @@ bwa index sacCer3.fa
 ```
 処理が済むと、*.amb、*.ann、*.bwt、*.pac というファイルが作成され、bwaが使用するインデックスとなります。
 
-#### 2.3.2. マッピング
+### 2.3.2. マッピング
 
 マッピングの出力用フォルダを作成しておきます。
 ```
@@ -358,7 +359,7 @@ vcf_out_folder=$main_folder/vcf_out
 mkdir -p $vcf_out_folder
 ```
 
-#### 2.4.1. 前処理
+### 2.4.1. 前処理
 
 シーケンスライブラリーの作成にPCRを使っている場合、マッピングされたリードの中に PCR duplication に由来する重複リードが含まれている可能性があります。このような重複リードはバリアントコールに偽陽性をもたらす可能性があるので、目印をつけておき（マーキング）、ダウンストリームで除去できるようにしておきます。なおゲノム縮約シーケンス（RAD-SeqやMig-Seq、GRAS-Di
 など）では、このような重複リードの除去は不必要です。
@@ -399,7 +400,7 @@ Duplicate リードが認識され、multiple mapping readsの除去によって
 
 これらの前処理に加えて、ヒトやマウスなどの生物では既知変異データをもとに塩基スコアを再計算してBAMファイルのクオリティーを補正すること(Base Quality Score Recalibration: BQSR)の有効性が示されていますが、本チュートリアルでは省略します。
 
-#### 2.4.2. バリアントコール
+### 2.4.2. バリアントコール
 
 gatk HaplotypeCaller コマンドを使って、バリアントコールをおこないます。
 * gatk ver4.0以降の HaplotypeCaller では、アクティブ領域 (各塩基のエントロピーの計算に基づいてバリアントの存在が予想される領域) を検出し、局所アッセンブルを適用することで、SNPs/INDELの検出精度が向上するという工夫が施されています。
@@ -436,7 +437,7 @@ awk '!/^#/' $vcf_out_folder/sake001.raw.vcf | wc -l
 ```
 計74383個の変異が検出されましたが、これらの中には偽陽性の可能性が高いものが含まれます。そこで次のステップでフィルタリングをおこないます。
 
-#### 2.4.3. フィルタリング
+### 2.4.3. フィルタリング
 
 上記のvcfファイルからSNPsの情報だけを取り出します。一般的にSNPsよりもINDELsの方が検出精度が低くなるため、それぞれを異なる閾値でフィルタリングすることが望ましいからです。
 ```
@@ -495,7 +496,7 @@ cd $main_folder
 ```
 
 
-<h2 id="Joint&nbsp;genotypingのワークフロー">3.&nbsp;Joint genotypingのワークフロー</h2>
+<h1 id="Joint&nbsp;genotypingのワークフロー">3.&nbsp;Joint genotypingのワークフロー</h1>
 
 Single sample genotypingの演習例で用いた酵母のサンプル[SRR5678551](https://www.ncbi.nlm.nih.gov/sra/SRR5678551)に加えて、２つのサンプル ([SRR5678548](https://www.ncbi.nlm.nih.gov/sra/SRR5678548), [SRR5678549](https://www.ncbi.nlm.nih.gov/sra/SRR5678549)  )を追加し、計３サンプルを対象としたワークフローを紹介します。以下のコマンド入力を試すにあたって、事前にフォルダへのパスなどの環境変数が有効になっていることを確認して下さい（リターンの結果が空ならば、再度、定義する必要があります）。
 ```
@@ -505,7 +506,7 @@ echo $bwa_out_folder
 echo $vcf_out_folder
 echo $no_threads
 ```
-### 3.1. シーケンスリードの取得
+## 3.1. シーケンスリードの取得
 
 追加の２サンプルとして、酵母のリシーケンスの生リードデータ [SRR5678548](https://www.ncbi.nlm.nih.gov/sra/SRR5678548) と[SRR5678549](https://www.ncbi.nlm.nih.gov/sra/SRR5678549) を公共データベースからダウンロードします。
 ```
@@ -521,7 +522,7 @@ head -n 8000000 SRR5678549_1.fastq | gzip > sake003_2M_1.fastq.gz
 head -n 8000000 SRR5678549_2.fastq | gzip > sake032_2M_1_2M_2.fastq.gz
 ```
 
-### 3.2. クオリティーコントロール
+## 3.2. クオリティーコントロール
 
 fastpを使って追加2サンプルのクオリティーコントロールを行ないます。
 ```
@@ -529,7 +530,7 @@ fastp -i sake002_2M_1.fastq.gz -I sake002_2M_2.fastq.gz -o sake002_2M_1.trimmed.
 fastp -i sake003_2M_1.fastq.gz -I sake003_2M_2.fastq.gz -o sake003_2M_1.trimmed.fastq.gz -O sake003_2M_2.trimmed.fastq.gz -f 5 -F 5 -q 30 -l 30 -w $no_threads -h sake003.fastp.report.html
 ```
 
-### 3.3. マッピング
+## 3.3. マッピング
 
 bwaで追加2サンプルをマッピングします。
 ```
@@ -540,8 +541,8 @@ bwa mem -t $no_threads -R "@RG\tID:sacCer\tSM:sake003\tPL:Illumina" $reference_f
 samtools index sake003.sorted.bam
 ```
 
-### 3.4. バリアントコール
-#### 3.4.1. 前処理
+## 3.4. バリアントコール
+### 3.4.1. 前処理
 2.4と同様に追加2サンプルを前処理をします。
 ```
 cd $bwa_out_folder
@@ -553,7 +554,7 @@ samtools index  -@ no_threads $bwa_out_folder/sake002.filtered.bam
 samtools index  -@ no_threads $bwa_out_folder/sake003.filtered.bam
 ```
 
-#### 3.4.2. バリアントコール
+### 3.4.2. バリアントコール
 
 複数のサンプルを対象にgatk HaplotypeCallerコマンドにてハプロタイプ推定をおこないます。Joing genotyping法におけるHaplotypeCallerのオプション設定は、2.4.2で使用したものと異なることに注意して下さい。Joing genotyping法では、"--emit-ref-confidence GVCF" というオプションを付けることで、ジェノタイピング処理を完遂せずに途中で止めて中間結果を保存し、その後のデータベース用の素材とします。
 ```
@@ -570,7 +571,7 @@ gatk GenomicsDBImport -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake001
 ```
 gatk GenotypeGVCFs -R $reference_folder/sacCer3.fa -V gendb://gDB -O sake.3samples.raw.vcf.gz
 ```
-#### 3.4.3. フィルタリング
+### 3.4.3. フィルタリング
 
 上記のvcf.gzファイルからSNPsの情報だけを切り出します。
 ```
@@ -631,7 +632,7 @@ cd $main_folder
 おつかれさまでした!！
 
 
-<h2 id="その他">4.&nbsp;その他</h2>
+<h1 id="その他">4.&nbsp;その他</h1>
 
 [Integrated Genome Viewer (IGV)](https://software.broadinstitute.org/software/igv/)を使って、マッピングやバリアントコールの結果を視覚化してみましょう。
 
