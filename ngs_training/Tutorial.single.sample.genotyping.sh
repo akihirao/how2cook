@@ -73,7 +73,11 @@ bwa mem -t $no_threads -R "@RG\tID:sacCer\tSM:sake001\tPL:Illumina" $reference_f
 ## 4. 変異検出
 
 samtools faidx $reference_folder/sacCer3.fa
-gatk CreateSequenceDictionary -R $reference_folder/sacCer3.fa -O $reference_folder/sacCer3.dict
+
+#Checking for gatk reference index (*.dict)
+if [ ! -e $reference_folder/sacCer3.dict ]; then
+	gatk CreateSequenceDictionary -R $reference_folder/sacCer3.fa -O $reference_folder/sacCer3.dict
+fi
 
 vcf_out_folder=$main_folder/vcf_out
 mkdir -p $vcf_out_folder
