@@ -38,16 +38,7 @@ mkdir -p $reference_folder
 cd $reference_folder
 
 # wgetコマンドで酵母のリファレンスゲノムを取得します。
-wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2_R64/GCF_000146045.2_R64_genomic.fna.gz
-
-# Macではwgetコマンドの代わりにcurlコマンドを使って下さい。
-#curl -O https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2_R64/GCF_000146045.2_R64_genomic.fna.gz
-
-#gzを展開
-gzip -d GCF_000146045.2_R64_genomic.fna.gz
-
-#コンパクトな名前に変更
-mv GCF_000146045.2_R64_genomic.fna sacCer3.fa
+wget -O - 'ftp://hgdownload.cse.ucsc.edu/goldenPath/sacCer3/chromosomes/chr*' | gunzip -c > sacCer3.fa
 
 cd $main_folder
 
