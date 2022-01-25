@@ -64,8 +64,13 @@
 
 ダウンロードする前に、こんな感じでメインの作業フォルダおよびリードデータの保管フォルダを作っておきます。
 ```
-user_name=hogehoge #アカウント名:hogehogeの場合
+#計算機環境に応じたスレッドを指定
+no_threads=3
+
+#アカウント(ここではhogehoge)の直下にwork/Scerというフォルダを作成
+user_name=hogehoge
 main_folder=/home/$user_name/work/Scer
+mkdir -p $main_folder
 fastq_folder=$main_folder/fastq
 mkdir -p $fastq_folder
 cd $fastq_folder
@@ -213,7 +218,6 @@ FastQCのインストール、使い方、レポートの見方について http
 fastpの使い方などについて　https://kazumaxneo.hatenablog.com/entry/2018/05/21/111947
 
 ```
-no_threads=3 #計算機環境に応じてスレッド数を指定
 cd $fastq_folder
 fastp -i sake001_2M_1.fastq.gz -I sake001_2M_2.fastq.gz -o sake001_2M_1.trimmed.fastq.gz -O sake001_2M_2.trimmed.fastq.gz -f 5 -F 5 -q 30 -l 30 -w $no_threads -h sake001.fastp.report.html
 ```
@@ -495,6 +499,8 @@ awk '!/^#/' $vcf_out_folder/sake001.snp.DPfilterNoCall.P99.vcf | wc -l
 cd $main_folder
 ```
 
+
+* これまでのsingle sample genotypingのワークフローをとりまとめたシェルスクリプト: [Tutorial.single.sample.genotyping.sh](https://github.com/akihirao/how2cook/blob/main/ngs_training/Tutorial.single.sample.genotyping.sh):
 
 <h1 id="Joint&nbsp;genotypingのワークフロー">3.&nbsp;Joint genotypingのワークフロー</h1>
 
