@@ -660,6 +660,7 @@ IGVの使い方について　https://bi.biopapyrus.jp/rnaseq/mapping/igv/
   - [NGSデータから新たな知識を導出するためのデータ解析リテラシー](https://github.com/yuifu/ajacs68): 尾崎遼さんらの講義資料@AJACS68
   - [macでインフォマティクス](https://kazumaxneo.hatenablog.com): 上坂一馬さんによるNGSツールなどの紹介
   - [(Rで)塩基配列解析](http://www.iu.a.u-tokyo.ac.jp/~kadota/r_seq.html): 門田先生らによる充実サイト
+  - [biopapyrus](https://biopapyrus.jp)
   - [統合TV（NGS解析だけでなくDBなども）](http://togotv.dbcls.jp)
   - [Linux標準教科書](http://www.lpi.or.jp/linuxtext/text.shtml)
 
