@@ -2,8 +2,8 @@
 
 * bedtools: a powerful toolset for genome arithmetic https://bedtools.readthedocs.io
 * BWA: Burrow-Wheeler Aligner http://bio-bwa.sourceforge.net
-* Bwa-mem2: the next version of the bwa-mem https://github.com/bwa-mem2/bwa-mem2)
-* fastp: an all-in-one preprocessing tool for fastq files (https://github.com/OpenGene/fastp
+* Bwa-mem2: the next version of the bwa-mem https://github.com/bwa-mem2/bwa-mem2
+* fastp: an all-in-one preprocessing tool for fastq files https://github.com/OpenGene/fastp
 * fastqc: a quality control tool https://www.bioinformatics.babraham.ac.uk/projects/fastqc
 * GATK: Genome Analysis Toolkit https://gatk.broadinstitute.org
 * Plink: whole-genome association analysis tool https://www.cog-genomics.org/plink
@@ -79,6 +79,7 @@ make
 Ver.0.39をbinaryでインストール
 
 ```
+cd /home/hogehoge/local
 wget http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.39.zip
 unzip Trimmomatic-0.39.zip
 cd Trimmomatic-0.39
@@ -90,6 +91,7 @@ ls
 Ver.1.9をbinaryでインストール
 
 ```
+cd /home/hogehoge/local
 wget https://s3.amazonaws.com/plink1-assets/plink_linux_x86_64_20210606.zip
 unzip plink_linux_x86_64_20210606.zip
 ```
@@ -98,6 +100,7 @@ unzip plink_linux_x86_64_20210606.zip
 Ver.2.0をbinaryでインストール
 
 ```
+cd /home/hogehoge/local
 wget https://s3.amazonaws.com/plink2-assets/plink2_linux_x86_64_20211217.zip
 unzip plink2_linux_x86_64_20211217.zip
 ```

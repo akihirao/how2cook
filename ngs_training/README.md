@@ -43,7 +43,7 @@
 
 出芽酵母（ *Saccharomyces* *cerevisiae* ）は、真核生物として最初にゲノムが解読されたモデル生物です。ゲノムサイズ（12.1Mb）が小さいため、塩基配列データもコンパクトで扱いやすく、高スペックの計算機を使わずともデータ解析をおこなうことができます。酵母のリシーケンスを例題として、公開データの取得から変異検出までの解析処理の流れを学びます。
 
-本チュートリアルの解析環境は、Ubuntuマシンに[使用NGSツールのリスト](#使用NGSツールのリスト)がインストール済みであることを想定しています。Macにおけるツール類の環境構築については、[上坂一馬さんのブログ](https://kazumaxneo.hatenablog.com/entry/2019/10/16/122613) などを参考にして下さい。
+本チュートリアルの解析環境は、Ubuntuマシンに[使用NGSツールのリスト](https://github.com/akihirao/how2cook/blob/main/ngs_training/ngs_tools/ngs_tools_list.md)がインストール済みであることを想定しています。Macにおけるツール類の環境構築については、[上坂一馬さんのブログ](https://kazumaxneo.hatenablog.com/entry/2019/10/16/122613) などを参考にして下さい。
 
 本チュートリアルの変異検出のパイプラインは、[GATKのgermline sort variant discoveryのワークフロー](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-)に基づいています。このワークフローには single sample genotyping と joint genotyping の２つの細分化された手法があります。Single sample genotypingは１サンプルずつ変異を検出するので、結果を逐次的に素早く取得することができます。それに対して joint genotypingでは全てのサンプルからの情報を一挙に活用して変異を検出するために、誤差が少なく高精度の推定結果を得ることができます。しかしながら計算コストが増加することに加えて、サンプルが追加されるたびにjoing genotyping処理をやりなおすといった手間が必要になります。解析の目的や時間的な制約に応じて、single sample genotyping と joint genotypingを使い分けるとよいでしょう。
 
@@ -677,12 +677,12 @@ IGVの使い方について　https://bi.biopapyrus.jp/rnaseq/mapping/igv/
 * bedtools: a powerful toolset for genome arithmetic https://bedtools.readthedocs.io
 * BWA*: Burrow-Wheeler Aligner http://bio-bwa.sourceforge.net
 * Bwa-mem2: the next version of the bwa-mem https://github.com/bwa-mem2/bwa-mem2)
-* fastp*: an all-in-one preprocessing tool for fastq files (https://github.com/OpenGene/fastp
-* fastqc*: a quality control tool https://www.bioinformatics.babraham.ac.uk/projects/fastqc
-* GATK*: Genome Analysis Toolkit https://gatk.broadinstitute.org
+* fastp: an all-in-one preprocessing tool for fastq files (https://github.com/OpenGene/fastp
+* fastqc: a quality control tool https://www.bioinformatics.babraham.ac.uk/projects/fastqc
+* GATK: Genome Analysis Toolkit https://gatk.broadinstitute.org
 * Plink: whole-genome association analysis tool https://www.cog-genomics.org/plink
-* samtools*: tools for manipulating NGS data https://github.com/samtools/samtools
-* seqkit*: an ultrafast toolkit for FASTA/Q file manipulation https://github.com/shenwei356/seqkit
+* samtools: tools for manipulating NGS data https://github.com/samtools/samtools
+* seqkit: an ultrafast toolkit for FASTA/Q file manipulation https://github.com/shenwei356/seqkit
 * TASSEL: trait analysis by association, evolution and linkage https://www.maizegenetics.net/tassel
 * Trimmomatic: a flexible read trimming tool https://github.com/usadellab/Trimmomatic
 * vcftools: a set of tools for working with VCF files https://github.com/vcftools/vcftools
@@ -753,6 +753,7 @@ make
 Ver.0.39をbinaryでインストール
 
 ```
+cd /home/hogehoge/local
 wget http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.39.zip
 unzip Trimmomatic-0.39.zip
 cd Trimmomatic-0.39
@@ -764,6 +765,7 @@ ls
 Ver.1.9をbinaryでインストール
 
 ```
+cd /home/hogehoge/local
 wget https://s3.amazonaws.com/plink1-assets/plink_linux_x86_64_20210606.zip
 unzip plink_linux_x86_64_20210606.zip
 ```
@@ -772,6 +774,7 @@ unzip plink_linux_x86_64_20210606.zip
 Ver.2.0をbinaryでインストール
 
 ```
+cd /home/hogehoge/local
 wget https://s3.amazonaws.com/plink2-assets/plink2_linux_x86_64_20211217.zip
 unzip plink2_linux_x86_64_20211217.zip
 ```
