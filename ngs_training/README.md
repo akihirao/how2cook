@@ -49,7 +49,6 @@
 
 ---
 
-
 <h1 id="Single&nbsp;sample&nbsp;genotyping">2.&nbsp;Single&nbsp;sample&nbsp;genotypingのワークフロー</h1>
 
 <h2 id="公開データ取得">2.1.&nbsp;公開データ取得</h2>
