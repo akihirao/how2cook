@@ -43,7 +43,7 @@
 
 出芽酵母（ *Saccharomyces* *cerevisiae* ）は、真核生物として最初にゲノムが解読されたモデル生物です。ゲノムサイズ（12.1Mb）が小さいため、塩基配列データもコンパクトで扱いやすく、高スペックの計算機を使わずともデータ解析をおこなうことができます。酵母のリシーケンスを例題として、公開データの取得から変異検出までの解析処理の流れを学びます。
 
-本チュートリアルの解析環境は、Ubuntuマシンに[使用NGSツールのリスト](https://github.com/akihirao/how2cook/blob/main/ngs_training/ngs_tools/ngs_tools_list.md)がインストール済みであることを想定しています。Macにおけるツール類の環境構築については、[上坂一馬さんのブログ](https://kazumaxneo.hatenablog.com/entry/2019/10/16/122613) などを参考にして下さい。
+本チュートリアルの解析環境は、Ubuntuマシンに[使用NGSツールのリスト](https://github.com/akihirao/how2cook/blob/main/ngs_training/ngs_tools/ngs_tools_list.md)がインストール済みであることを想定しています。
 
 本チュートリアルの変異検出のパイプラインは、[GATKのgermline sort variant discoveryのワークフロー](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-)に基づいています。このワークフローには single sample genotyping と joint genotyping の２つの細分化された手法があります。Single sample genotypingは１サンプルずつ変異を検出するので、結果を逐次的に素早く取得することができます。それに対して joint genotypingでは全てのサンプルからの情報を一挙に活用して変異を検出するために、誤差が少なく高精度の推定結果を得ることができます。しかしながら計算コストが増加することに加えて、サンプルが追加されるたびにjoing genotyping処理をやりなおすといった手間が必要になります。解析の目的や時間的な制約に応じて、single sample genotyping と joint genotypingを使い分けるとよいでしょう。
 
