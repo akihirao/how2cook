@@ -12,9 +12,7 @@ no_threads=3
 ######################################
 ## 1. 公開データ取得
 
-#アカウント(hogehoge)
-user_name=hogehoge
-#ターミナルを立ち上げた場所の直下にScerというフォルダを作成
+#ターミナルを立ち上げた場所の直下にScerというフォルダを作成し、そこで作業をおこないます。
 main_folder=$SCRIPT_DIR/Scer
 mkdir -p $main_folder
 #Scerの直下にfastqというフォルダを作成し、生リードの保存場所とする
