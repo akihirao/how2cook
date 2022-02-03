@@ -494,18 +494,22 @@ awk '!/^#/' $vcf_out_folder/sake001.snp.DPfilterNoCall.P99.vcf | wc -l
 ```
 フィルタリング後のSNPsは60,909個となりました。
 
-メインの作業フォルダに戻っておきましょう。
+これまでのsingle sample genotypingの一連のコマンドを一つのシェルスクリプトにまとめておくと、一括して処理できるようになります。
+* [Tutorial.single.sample.genotyping.sh](https://github.com/akihirao/how2cook/blob/main/ngs_training/Tutorial.single.sample.genotyping.sh)
+
+スタート時の作業フォルダに戻っておきましょう。
 ```
-cd $main_folder
+cd $main_folder../
 ```
 
 
-* これまでのsingle sample genotypingのワークフローをとりまとめたシェルスクリプト: [Tutorial.single.sample.genotyping.sh](https://github.com/akihirao/how2cook/blob/main/ngs_training/Tutorial.single.sample.genotyping.sh):
+
 
 <h1 id="Joint&nbsp;genotypingのワークフロー">3.&nbsp;Joint genotypingのワークフロー</h1>
 
-Single sample genotypingの演習例で用いた酵母のサンプル[SRR5678551](https://www.ncbi.nlm.nih.gov/sra/SRR5678551)に加えて、２つのサンプル ([SRR5678548](https://www.ncbi.nlm.nih.gov/sra/SRR5678548), [SRR5678549](https://www.ncbi.nlm.nih.gov/sra/SRR5678549)  )を追加し、計３サンプルを対象としたワークフローを紹介します。以下のコマンド入力を試すにあたって、事前にフォルダへのパスなどの環境変数が有効になっていることを確認して下さい（リターンの結果が空ならば、再度、定義する必要があります）。
+Single sample genotypingの演習例で用いた酵母のサンプル[SRR5678551](https://www.ncbi.nlm.nih.gov/sra/SRR5678551)に加えて、２つのサンプル ([SRR5678548](https://www.ncbi.nlm.nih.gov/sra/SRR5678548), [SRR5678549](https://www.ncbi.nlm.nih.gov/sra/SRR5678549)  )を追加し、計３サンプルを対象としたワークフローを紹介します。以下のコマンド入力を試すにあたって、事前にフォルダへのパスなどの環境変数が有効になっていることを確認し、もしリターンの結果が空ならば、前章を参考にして再定義して下さい。
 ```
+echo $main_folder
 echo $fastq_folder
 echo $reference_folder
 echo $bwa_out_folder
@@ -570,12 +574,14 @@ gatk HaplotypeCaller -R $reference_folder/sacCer3.fa -I $bwa_out_folder/sake003.
 ```
 続いて、中間ファイルをローカルデータベースにまとめます。
 ```
-echo -e "chrI\nchrII\nchrIII\nchrIV\nchrIX\nchrV\nchrVI\nchrVII\nchrVIII\nchrX\nchrXI\nchrXII\nchrXIII\nchrXIV\nchrXVI\nchrM" > intervals.list
-gatk GenomicsDBImport -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake001.g.vcf.gz  -V $vcf_out_folder/sake002.g.vcf.gz  -V $vcf_out_folder/sake003.g.vcf.gz -L intervals.list --genomicsdb-workspace-path gDB
+cd $vcf_out_folder
+DB_path=$main_folder/gDB
+echo -e "chrI\nchrII\nchrIII\nchrIV\nchrIX\nchrV\nchrVI\nchrVII\nchrVIII\nchrX\nchrXI\nchrXII\nchrXIII\nchrXIV\nchrXVI\nchrM" > $reference_folder/intervals.list
+gatk GenomicsDBImport -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake001.g.vcf.gz  -V $vcf_out_folder/sake002.g.vcf.gz  -V $vcf_out_folder/sake003.g.vcf.gz -L $reference_folder/intervals.list --genomicsdb-workspace-path $DB_path
 ```
 その上でgatk GenotypeGVCFsコマンドを用いてデータベースから３サンプルをまとめてジェノタイピングします。
 ```
-gatk GenotypeGVCFs -R $reference_folder/sacCer3.fa -V gendb://gDB -O sake.3samples.raw.vcf.gz
+gatk GenotypeGVCFs -R $reference_folder/sacCer3.fa -V gendb://$DB_path -O $vcf_out_folder/sake.3samples.raw.vcf.gz
 ```
 ### 3.4.3. フィルタリング
 
@@ -630,8 +636,14 @@ gzip -dc $vcf_out_folder/sake.3samples.snp.DPfilterNoCall.P99.vcf.gz | awk '!/^#
 71148
 ```
 フィルタリング後に計71,148個のSNPsが同定されました。
+
+これまでのjoint genotypingの一連のコマンドは、次のシェルスクリプトで一括して処理できます。
+* [Tutorial.joint.genotyping.sh](https://github.com/akihirao/how2cook/blob/main/ngs_training/Tutorial.joint.genotyping.sh)
+
+スタート時のフォルダに戻っておきましょう。
+
 ```
-cd $main_folder
+cd $main_folder../
 ```
 これで本チュートリアルにおけるコマンド操作はすべて完了です。
 
@@ -815,7 +827,7 @@ grep -c '^>' input.fasta | wc -l #fastaの配列数を表示
 ```
 
 ---
-Linuxコマンド(Bash)でバックグラウンド実行する方法のまとめメモ 
+Linuxコマンド(Bash)でバックグラウンド実行する方法のまとめメモ
 * https://qiita.com/inosy22/items/341cfc589494b8211844
 
 
