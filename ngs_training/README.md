@@ -45,7 +45,7 @@
 
 本チュートリアルの解析環境は、Ubuntuマシンに[使用NGSツールのリスト](https://github.com/akihirao/how2cook/blob/main/ngs_training/ngs_tools/ngs_tools_list.md)がインストール済みであることを想定しています。
 
-ツール類の環境構築の例として、MacにてAnaconda/miniconda::biocondaを利用した方法については[上坂一馬さんのブログ](https://kazumaxneo.hatenablog.com/entry/2019/10/16/122613) が参考になります。なおAnacondaは大規模な商用利用（規模が200人以上の営利団体による利用）では有償契約が必要になりますので、所属機関におけるライセンスに注意して下さい。その他のツールの環境構築として、Biocontainersからdockerイメージを使うという方法もあります（[東大水圏生物工学研究室・吉武先生のブログ](http://www.suikou.fs.a.u-tokyo.ac.jp/blog/2019/07/22/ツール比較のための環境構築について/)）。
+ツール類の環境構築の例として、Anaconda/miniconda::biocondaを利用した方法については[上坂一馬さんのブログ](https://kazumaxneo.hatenablog.com/entry/2019/10/16/122613) が参考になります。なおAnacondaは大規模な商用利用（規模が200人以上の営利団体による利用）では有償契約が必要になりますので、所属機関におけるライセンスに注意して下さい。その他のツールの環境構築として、Biocontainersからdockerイメージを使うという方法もあります（[東大水圏生物工学研究室・吉武先生のブログ](http://www.suikou.fs.a.u-tokyo.ac.jp/blog/2019/07/22/ツール比較のための環境構築について/)）。
 
 本チュートリアルの変異検出のパイプラインは、[GATKのgermline sort variant discoveryのワークフロー](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-)に基づいています。このワークフローには single sample genotyping と joint genotyping の２つの細分化された手法があります。Single sample genotypingは１サンプルずつ変異を検出するので、結果を逐次的に素早く取得することができます。それに対して joint genotypingでは全てのサンプルからの情報を一挙に活用して変異を検出するために、誤差が少なく高精度の推定結果を得ることができます。しかしながら計算コストが増加することに加えて、サンプルが追加されるたびにjoing genotyping処理をやりなおすといった手間が必要になります。解析の目的や時間的な制約に応じて、single sample genotyping と joint genotypingを使い分けるとよいでしょう。
 
@@ -814,7 +814,9 @@ head -n 4 file1 #無圧縮ファイル file1 の冒頭の４行を画面出力
 grep -c '^>' input.fasta | wc -l #fastaの配列数を表示
 ```
 
-Linuxコマンド(Bash)でバックグラウンド実行する方法のまとめメモ https://qiita.com/inosy22/items/341cfc589494b8211844
+---
+Linuxコマンド(Bash)でバックグラウンド実行する方法のまとめメモ 
+* https://qiita.com/inosy22/items/341cfc589494b8211844
 
 
 [ページトップに戻る](https://github.com/akihirao/how2cook/tree/main/ngs_training#NGSデータ解析チュートリアル)
