@@ -619,7 +619,7 @@ gatk VariantFiltration -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake.3
 gatk SelectVariants -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake.3samples.snp.DPfilterPASSED.vcf.gz --set-filtered-gt-to-nocall -O $vcf_out_folder/sake.3samples.snp.DPfilterNoCall.vcf.gz
 ```
 
-複数サンプルを対象としてジェノタイピングをおこなうと、各々のサンプルによって遺伝子型が欠損するようなサイトがたびたび生じます。そのような欠損サイトの取扱や注意点いについて、ゲノム縮約シーケンスデータを対象とした岩崎貴也さんの次の講演資料が参考になります。
+複数サンプルを対象としてジェノタイピングをおこなうと、各々のサンプルによって遺伝子型が欠損するようなサイトがたびたび生じ、特にRAD-Seqなどのゲノム縮約シーケンスでは欠損サイトが顕著に認められます。このような欠損データの取り扱いや注意点などについては、岩崎貴也さんの次の講演資料を参考下さい。
 
 * [NGSのSNPデータを集団遺伝解析に使う事の利点と欠点：非モデル生物の研究で気をつけることは？](https://drive.google.com/file/d/1UK04C1IbHGvosibPWjjbKT1t1pcaTR9-/view)
 
