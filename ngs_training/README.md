@@ -45,6 +45,12 @@
 
 本チュートリアルの解析環境は、Ubuntuマシンに[使用NGSツールのリスト](https://github.com/akihirao/how2cook/blob/main/ngs_training/ngs_tools/ngs_tools_list.md)がインストール済みであることを想定しています。
 
+Macにおけるツール類の環境構築の例として、Anaconda/miniconda::biocondaを利用した方法については[上坂一馬さんのブログ](https://kazumaxneo.hatenablog.com/entry/2019/10/16/122613) などを参考にして下さい。なおAnacondaは大規模な商用利用（規模が200人以上の営利団体による利用）では有償契約が必要になります。所属機関での
+ライセンス利用に注意して下さい。。
+
+その他にはBiocontainersからdockerイメージを使って、ツールを導入するという方法もあります。
+* [東大水圏生物工学研究室・吉武先生のブログ](http://www.suikou.fs.a.u-tokyo.ac.jp/blog/2019/07/22/ツール比較のための環境構築について/)
+
 本チュートリアルの変異検出のパイプラインは、[GATKのgermline sort variant discoveryのワークフロー](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-)に基づいています。このワークフローには single sample genotyping と joint genotyping の２つの細分化された手法があります。Single sample genotypingは１サンプルずつ変異を検出するので、結果を逐次的に素早く取得することができます。それに対して joint genotypingでは全てのサンプルからの情報を一挙に活用して変異を検出するために、誤差が少なく高精度の推定結果を得ることができます。しかしながら計算コストが増加することに加えて、サンプルが追加されるたびにjoing genotyping処理をやりなおすといった手間が必要になります。解析の目的や時間的な制約に応じて、single sample genotyping と joint genotypingを使い分けるとよいでしょう。
 
 ---
