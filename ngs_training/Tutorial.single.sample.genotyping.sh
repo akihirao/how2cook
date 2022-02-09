@@ -102,7 +102,7 @@ gatk SelectVariants -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake001.r
 gatk VariantFiltration -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake001.snp.vcf -filter "QD < 2.0" --filter-name "QD2" -filter "QUAL < 30.0" --filter-name "QUAL30" -filter "SOR > 3.0" --filter-name "SOR3" -filter "FS > 60.0" --filter-name "FS60" -filter "MQ < 40.0" --filter-name "MQ40" -filter "MQRankSum < -12.5" --filter-name "MQRankSum-12.5" -filter "ReadPosRankSum < -8.0" --filter-name "ReadPosRankSum-8" -O $vcf_out_folder/sake001.snp.filter.vcf
 
 #上記のコマンドでPASSしたサイトのみを抽出
-grep -E '^#|PASS' $vcf_out_folder/sake001.snp.filter.vcf  > $vcf_out_folder/sake001.snp.filterPASSED.vcf
+gatk SelectVariants -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake001.snp.filter.vcf  --exclude-filtered -O $vcf_out_folder/sake001.snp.filterPASSED.vcf
 
 #FORMAT filedを-G-filterの閾値でマーク
 gatk VariantFiltration -R $reference_folder/sacCer3.fa -V $vcf_out_folder/sake001.snp.filterPASSED.vcf -G-filter "GQ < 20" -G-filter-name "GQ20" -G-filter "DP < 10" -G-filter-name "DP10" -O $vcf_out_folder/sake001.snp.DPfilterPASSED.vcf
