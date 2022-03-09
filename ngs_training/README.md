@@ -742,23 +742,24 @@ git clone https://github.com/lh3/bwa.git
 cd bwa; make
 ```
 
-#### samtools: 2022/01/19時点の最新版はv1.14
+#### samtools: 2022/03/8時点の最新版はv1.15
 HTSlib入りのソースからコンパイルする例です。HTSlib projectの一部であるtabixとbgzipは使用頻度の高いツールなので、HTSlibもビルドしておきましょう。
 
 ```
 cd /home/hogehoge/local
-wget https://github.com/samtools/samtools/releases/download/1.14/samtools-1.14.tar.bz2
-tar -xvf samtools-1.14.tar.bz2
-cd samtools-1.14
+wget https://github.com/samtools/samtools/releases/download/1.15/samtools-1.15.tar.bz2
+tar -xvf samtools-1.15.tar.bz2
+cd samtools-1.15
 ./configure --prefix=/user/hogehoge/local/
 make
 ./samtools --version
-cd htslib-1.14
-./configure
+make install
+cd htslib-1.15
+./configure --prefix=/user/hogehoge/local
 make
 ./tabix --version
 ./bgzip --version
-
+make install
 ```
 #### Trimmomatic
 Ver.0.39をbinaryでインストール
