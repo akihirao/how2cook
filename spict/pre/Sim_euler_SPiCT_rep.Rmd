@@ -23,7 +23,7 @@ library(gridExtra)
 #シュミレーションのベースデータの読込および設定
 
 ```{r message = FALSE, warning = FALSE, echo = TRUE}
-data_raw <- read.csv("~/work/git_work/frapmt/raw-data/example1.csv") 
+data_raw <- read.csv("example1.csv") 
 # https://github.com/ichimomo/frapmt/blob/main/raw-data/example1.csv #オリジナルデポジット
 
 inp  <- get_spict_data(data_raw)
@@ -68,8 +68,8 @@ inp_sim$ini$logsdf <- log(sdf_true)
 
 ```{r message = FALSE, warning = FALSE, echo = TRUE}
 no_sim <- 50 #処理単位のシュミレーション数
-euler_value_series <- c(1/64,1/16,1/4,1)
-#euler_value_series <- c(1/16,1/4,1)
+#euler_value_series <- c(1/64,1/16,1/4,1)
+euler_value_series <- c(1/16,1/4,1)
 no_euler_series <- length(euler_value_series)
 
 res_out <- as.list(numeric(no_sim))
@@ -130,16 +130,16 @@ for(k in 1:no_sim){
 param_out <- as.tibble(data.frame(r=r_estimate, K=K_estimate, m=m_estimate,sdb=sdb_estimate,sim=sim_lab,euler_pre=euler_pre_lab,euler_post=euler_post_lab))
 
 param <- param_out %>% mutate(euler_generate=euler_pre,euler_estimate=euler_post)
-param$euler_generate <- sub(0.015625, "1/64",param$euler_generate)
-param$euler_generate <- sub("0.0625", "1/16",param$euler_generate)
-param$euler_generate <- sub("0.25", "1/4",param$euler_generate)
-param$euler_generate <- sub("1", "1",param$euler_generate)
-param$euler_estimate <- sub(0.015625, "1/64",param$euler_estimate)
-param$euler_estimate <- sub("0.0625", "1/16",param$euler_estimate)
-param$euler_estimate <- sub("0.25", "1/4",param$euler_estimate)
-param$euler_estimate <- sub("1", "1",param$euler_estimate)
-param$euler_generate <- factor(param$euler_generate, levels=c("1/64","1/16","1/4","1"))
-param$euler_estimate <- factor(param$euler_estimate, levels=c("1/64","1/16","1/4","1"))
+#param$euler_generate <- sub(0.015625, "1/64",param$euler_generate)
+param$euler_generate <- sub(0.0625, "1/16",param$euler_generate)
+param$euler_generate <- sub(0.25, "1/4",param$euler_generate)
+param$euler_generate <- sub(1, "1",param$euler_generate)
+#param$euler_estimate <- sub(0.015625, "1/64",param$euler_estimate)
+param$euler_estimate <- sub(0.0625, "1/16",param$euler_estimate)
+param$euler_estimate <- sub(0.25, "1/4",param$euler_estimate)
+param$euler_estimate <- sub(1, "1",param$euler_estimate)
+param$euler_generate <- factor(param$euler_generate, levels=c("1/16","1/4","1"))
+param$euler_estimate <- factor(param$euler_estimate, levels=c("1/16","1/4","1"))
 ```
 
 ```{r message = FALSE, warning = FALSE, echo = TRUE}
@@ -165,11 +165,11 @@ corr_eqn <- function(x,y, digits = 2) {
   corr_p_value <- cor.test(x, y)$p.value
   paste("italic(r) == ", corr_coef,"~';'~italic(P)==", corr_p_value)
 }
-labels = data.frame(x =1.0, y = 1.2, label = corr_eqn(param$r, param$sdb))
+labels = data.frame(x =0.6, y = 0.8, label = corr_eqn(param$r, param$sdb))
 
 r_sdb_cor_out <- cor.test(param$r,param$sdb)
 
-r_sdb_plot <- ggplot(param) +geom_point(aes(x=r,y=sdb,color=euler_estimate,shape=euler_generate)) + labs(y="sigma_B") + geom_text(data = labels, aes(x = x, y = y,label = label), parse = TRUE) + xlim(0,2) + ylim(0,1.2)
+r_sdb_plot <- ggplot(param) +geom_point(aes(x=r,y=sdb,color=euler_estimate,shape=euler_generate)) + labs(y="sigma_B") + geom_text(data = labels, aes(x = x, y = y,label = label), parse = TRUE) + xlim(0,2) + ylim(0,1)
 
 plot(r_sdb_plot)
 ```
