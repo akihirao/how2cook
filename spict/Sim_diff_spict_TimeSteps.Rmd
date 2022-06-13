@@ -13,7 +13,6 @@ output:
 -----
 
 ####Sim_diff_PM.R
-####クラスター計算機saintsで実行（iMacではキビシイ）@2022Jun08
 
 ####ライブラリーSPiCTの読み込み
 ```{r message = FALSE, warning = FALSE, echo = TRUE}
@@ -106,9 +105,8 @@ res_out <- as.list(numeric(no_sim))
 #}
 
 ####シミュレーションの実行
-k <- 0
+k <- 1
 while (k <= no_sim){
-	k <- k + 1
   inp <- sim.dif.pdm("gradual",range_year,K_true, r_true, n_true,q_true,sigma_pro, sigma_obs)
 	inp$priors$logn <- c(log(1.19),0.0001,1)
 	inp$priors$logr <- c(log(0.5),1, 1)
@@ -133,11 +131,11 @@ while (k <= no_sim){
 	    inp$priors$logr <- c(log(0.5),1, 1)
 
 	    l <- 1
-		  k <- k -1
-		  
+
 		}
-  }
+	}
 	res_out[[k]] <- res
+	k <- k + 1
 }
 ```
 
