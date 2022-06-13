@@ -1,0 +1,259 @@
+---
+title: Sim_diff_PM
+author: "Akira Hirao"
+date: "`r Sys.Date()`"
+output:
+  md_document:
+    toc: true
+    variant: markdown_github
+  html_document:
+    toc: true
+---
+
+-----
+
+####Sim_diff_PM.R
+####クラスター計算機saintsで実行（iMacではキビシイ）@2022Jun08
+
+####ライブラリーSPiCTの読み込み
+```{r message = FALSE, warning = FALSE, echo = TRUE}
+library(spict)
+library(tidyverse)
+library(gridExtra)
+library(ggbeeswarm)
+```
+
+####シュミレーション用のパラメーターを設定
+
+```{r message = FALSE, warning = FALSE, echo = TRUE}
+K_true <- 1000　#環境収容力の真の値
+r_true <- 0.4　#内的自然増加率の真の値
+n_true <- 1.19　#形状パラメータの真の値
+m_true <- r_true*K_true/(n_true^(n_true/(n_true-1)))
+q_true <- 0.1 #漁具能率
+sigma_pro <- 0.3　# 資源量のプロセス誤差
+sigma_obs <- 0.3　# cpueの観測誤差
+sdf_true <- 0.3 # 漁獲率のプロセス誤差
+Bmsyd_true <- K_true*n_true^(1/(1 - n_true))
+
+range_year <- c(1980,2020)
+```
+
+####差分型ブロダクションモデルによるシュミレーションデータの生成
+
+```{r message = FALSE, warning = FALSE, echo = TRUE}
+sim.dif.pdm <- function(type, range_year, K, r, n, q, sigma_pro, sigma_obs){
+	if(type=="contrast"){
+		years <- seq(range_year[1],range_year[2],by=1)
+		nyears <- length(years)
+
+		F_vec <- B_vec <- C_vec <- NULL
+		B_vec[1] <- K*runif(1,0,1) # 初期枯渇率をランダムに決める
+		F_vec[1] <- runif(1,0,1) # 初期の漁獲率をランダムに決める
+
+		for(t in 2:nyears){
+			t_pre <- t - 1
+		
+			C_vec[t_pre] <- B_vec[t_pre]*F_vec[t_pre]
+			B_vec[t] <- (B_vec[t_pre] + r/(n - 1)*B_vec[t_pre]*(1 - (B_vec[t_pre]/K)^(n - 1)) - F_vec[t_pre] * B_vec[t_pre])*exp(rnorm(1,-sigma_pro^2/2,sigma_pro))
+			F_vec[t] <- runif(1,0,1)
+		}
+
+		C_vec[nyears] <- B_vec[nyears]*F_vec[nyears]
+		cpue <- exp(rnorm(nyears, log(q*B_vec), sigma_obs))
+		inp <- list(obsC=C_vec,timeC=years, obsI= cpue,timeI=years)
+
+		return(inp)
+
+	}else if(type=="gradual"){
+		F0 <- 0.3
+		years <- seq(range_year[1],range_year[2],by=1)
+		nyears <- length(years)
+
+				F_vec <- B_vec <- C_vec <- NULL
+		B_vec[1] <- K*runif(1,0,1) # 初期枯渇率をランダムに決める
+		F_vec[1] <- F0 # 初期の漁獲率
+		
+		for(t in 2:nyears){
+			t_pre <- t - 1
+			C_vec[t_pre] <- B_vec[t_pre]*F_vec[t_pre]
+			B_vec[t] <- (B_vec[t_pre] + r/(n - 1)*B_vec[t_pre]*(1 - (B_vec[t_pre]/K)^(n - 1)) - F_vec[t_pre] * B_vec[t_pre])*exp(rnorm(1,-sigma_pro^2/2,sigma_pro))
+			F_vec[t] <- exp(log(F0)+ rnorm(1,0,0.1)) 
+		}
+				C_vec[nyears] <- B_vec[nyears]*F_vec[nyears]
+		cpue <- exp(rnorm(nyears, log(q*B_vec), sigma_obs))
+		inp <- list(obsC=C_vec,timeC=years, obsI= cpue,timeI=years)
+		return(inp)
+
+	}else{
+		
+	}
+}
+```
+
+#　シミュレーション 
+
+```{r message = FALSE, warning = FALSE, echo = TRUE}
+no_sim <- 100
+#euler_value_series <- c(1/16,1/4,1/1)
+euler_value_series <- c(1/64,1/16,1/4,1/1)
+no_euler_series <- length(euler_value_series)
+
+####fit.spictの結果を収納するリスト作成
+res_out <- as.list(numeric(no_sim))
+#for(i in 1:no_sim){
+#	res_out[[i]] <- as.list(numeric(no_euler_series))
+#}
+
+####シミュレーションの実行
+k <- 0
+while (k <= no_sim){
+	k <- k + 1
+  inp <- sim.dif.pdm("gradual",range_year,K_true, r_true, n_true,q_true,sigma_pro, sigma_obs)
+	inp$priors$logn <- c(log(1.19),0.0001,1)
+	inp$priors$logr <- c(log(0.5),1, 1)
+	
+	l <- 1
+	res <- as.list(numeric(no_euler_series))
+	while (l <= no_euler_series){
+	  inp$dteuler <- euler_value_series[l]
+		inp$stabilise <- set_stabilise <- 1
+		inp <- check.inp(inp)
+		res_out_temp <- fit.spict(inp)
+		convergence <- res_out_temp$opt$convergence #収束チェック
+		finiteness <- all(is.finite(res_out_temp$sd))
+		
+		if(convergence == 0 && finiteness == TRUE){#収束しているならば
+		  res[[l]] <- res_out_temp
+		  l <- l + 1
+		}else{
+		  
+		  inp <- sim.dif.pdm("gradual",range_year,K_true, r_true, n_true,q_true,sigma_pro, sigma_obs)
+	    inp$priors$logn <- c(log(1.19),0.0001,1)
+	    inp$priors$logr <- c(log(0.5),1, 1)
+
+	    l <- 1
+		  k <- k -1
+		  
+		}
+  }
+	res_out[[k]] <- res
+}
+```
+
+### summarizing parameters
+
+```{r message = FALSE, warning = FALSE, echo = TRUE}
+
+####シミュレーションの結果をtidyデータに出力
+r_estimate <- vector()
+K_estimate <- vector()
+m_estimate <- vector()
+Fmsys_estimate <- vector()
+Bmsys_estimate <- vector()
+MSYs_estimate <- vector()
+sdb_estimate <- vector()
+sim_lab <- vector()
+time_step <- vector()
+
+count_vec <- 1
+for(m in 1:no_sim){
+	for(n in 1:no_euler_series){
+	  
+    pos_r <- match("r",names(res_out[[m]][[n]]$value))
+    pos_K <- match("K",names(res_out[[m]][[n]]$value))
+    pos_m <- match("m",names(res_out[[m]][[n]]$value))
+    pos_sdb <- match("sdb",names(res_out[[m]][[n]]$value))
+    pos_Bmsys <- match("Bmsys",names(res_out[[m]][[n]]$value))
+    pos_Fmsys <- match("Fmsys",names(res_out[[m]][[n]]$value))
+    pos_MSYs <- match("MSYs",names(res_out[[m]][[n]]$value))
+
+    r_estimate[count_vec] <- res_out[[m]][[n]]$value[pos_r][[1]]
+    K_estimate[count_vec] <- res_out[[m]][[n]]$value[pos_K][[1]]
+    m_estimate[count_vec] <- res_out[[m]][[n]]$value[pos_m][[1]]
+    sdb_estimate[count_vec] <- res_out[[m]][[n]]$value[pos_sdb][[1]]
+    Bmsys_estimate[count_vec] <- res_out[[m]][[n]]$value[pos_Bmsys][[1]]
+    Fmsys_estimate[count_vec] <- res_out[[m]][[n]]$value[pos_Fmsys][[1]]
+    MSYs_estimate[count_vec] <- res_out[[m]][[n]]$value[pos_MSYs][[1]]
+      
+    sim_lab[count_vec] <- m
+    time_step[count_vec] <- euler_value_series[n]
+  
+    count_vec <- count_vec + 1
+	}
+}
+
+param <- as.tibble(data.frame(r=r_estimate, K=K_estimate, m=m_estimate, sdb=sdb_estimate, Bmsys=Bmsys_estimate, Fmsys=Fmsys_estimate, MSYs=MSYs_estimate, sim=sim_lab, time_step=time_step)) %>% mutate(time_step_lab=time_step)
+
+param$time_step_lab <- sub(0.015625, "1/64",param$time_step_lab)
+param$time_step_lab <- sub("0.0625", "1/16",param$time_step_lab)
+param$time_step_lab <- sub("0.25", "1/4",param$time_step_lab)
+param$time_step_lab <- sub("1", "1",param$time_step_lab)
+param$time_step_lab <- factor(param$time_step_lab, levels=c("1/64","1/16","1/4","1"))
+#param$time_step_lab <- factor(param$time_step_lab, levels=c("1/16","1/4","1"))
+
+param_summary <- param %>% group_by(time_step_lab) %>% dplyr::summarise(r_median=format(round(median(r),2),nsmall=2), K_median=format(round(median(K),1),nsmall=1),m_median=format(round(median(m),1),nsmall=1),sdb_median=format(round(median(sdb),3),nsmall=3),Bmsys_median=format(round(median(Bmsys),1),nsmall=1),Fmsys_median=format(round(median(Fmsys),3),nsmall=3),MSYs_median=format(round(median(MSYs),1),nsmall=1),r_CV=format(round(sd(r)/mean(r),3),nsmall=3), K_CV=format(round(sd(K)/mean(K),3),nsmall=3),m_CV=format(round(sd(m)/mean(m),3),nsmall=3),sdb_CV=format(round(sd(sdb)/mean(sdb),3),nsmall=3),Bmsys_CV=format(round(sd(Bmsys)/mean(Bmsys),3),nsmall=3),Fmsys_CV=format(round(sd(Fmsys)/mean(Fmsys),3),nsmall=3),MSYs_CV=format(round(sd(MSYs)/mean(MSYs),3),nsmall=3))
+print(param_summary)
+```
+
+####Violinplot for each of parameters
+
+```{r message = FALSE, warning = FALSE, echo = TRUE}
+r_violinplot <- ggplot(param, aes(x=time_step_lab, y=r, color=time_step_lab)) + labs(x = "Time step")
+r_violinplot <- r_violinplot + geom_violin() 
+r_violinplot <- r_violinplot + geom_quasirandom(size=0.01, alpha=0.5) + geom_hline(yintercept = r_true, linetype="dashed", col="red")
+
+K_violinplot <- ggplot(param, aes(x=time_step_lab, y=K, color=time_step_lab)) + labs(x = "Time step")
+K_violinplot <- K_violinplot + geom_violin() 
+K_violinplot <- K_violinplot + geom_quasirandom(size=0.01, alpha=0.5) + geom_hline(yintercept = K_true, linetype="dashed", col="red")
+
+m_violinplot <- ggplot(param, aes(x=time_step_lab, y=m, color=time_step_lab)) + labs(x = "Time step")
+m_violinplot <- m_violinplot + geom_violin() 
+m_violinplot <- m_violinplot + geom_quasirandom(size=0.01, alpha=0.5) + geom_hline(yintercept = m_true, linetype="dashed", col="red")
+
+Bmsys_violinplot <- ggplot(param, aes(x=time_step_lab, y=Bmsys, color=time_step_lab)) + labs(x = "Time step")
+Bmsys_violinplot <- Bmsys_violinplot + geom_violin() 
+Bmsys_violinplot <- Bmsys_violinplot + geom_quasirandom(size=0.01, alpha=0.5)
+
+Fmsys_violinplot <- ggplot(param, aes(x=time_step_lab, y=Fmsys, color=time_step_lab)) + labs(x = "Time step")
+Fmsys_violinplot <- Fmsys_violinplot + geom_violin() 
+Fmsys_violinplot <- Fmsys_violinplot + geom_quasirandom(size=0.01, alpha=0.5)
+
+params_violinplot <- grid.arrange(r_violinplot, K_violinplot, m_violinplot, ncol=1)
+plot(params_violinplot)
+
+```
+
+```{r message = FALSE, warning = FALSE, echo = TRUE}
+
+r_boxplot <- ggplot(param, aes(x=time_step_lab, y=r, color=time_step_lab)) + labs(x = "Time step")
+r_boxplot  <- r_boxplot + geom_boxplot() + geom_hline(yintercept = r_true, linetype="dashed", col="red")
+
+K_boxplot <- ggplot(param, aes(x=time_step_lab, y=K, color=time_step_lab)) + labs(x = "Time step")
+K_boxplot  <- K_boxplot + geom_boxplot() + geom_hline(yintercept = K_true, linetype="dashed", col="red")
+
+m_boxplot <- ggplot(param, aes(x=time_step_lab, y=m, color=time_step_lab)) + labs(x = "Time step")
+m_boxplot  <- m_boxplot + geom_boxplot() + geom_hline(yintercept = m_true, linetype="dashed", col="red")
+
+params_boxplot <- grid.arrange(r_boxplot, K_boxplot, m_boxplot, ncol=1)
+plot(params_boxplot)
+
+```
+
+####correlation between r and sigma_pro
+
+```{r message = FALSE, warning = FALSE, echo = TRUE}
+corr_eqn <- function(x,y, digits = 2) {
+  corr_coef <- round(cor(x, y), digits = digits)
+  corr_p_value <- cor.test(x, y)$p.value
+  paste("italic(r) == ", corr_coef,"~';'~italic(P)==", corr_p_value)
+}
+labels = data.frame(x =1.0, y = 1.2, label = corr_eqn(param$r, param$sdb))
+r_sdb_cor_out <- cor.test(param$r,param$sdb)
+r_sdb_plot <- ggplot(param) +geom_point(aes(x=r,y=sdb,color=time_step_lab)) + labs(y="sigma_B") + geom_text(data = labels, aes(x = x, y = y,label = label), parse = TRUE) + xlim(0,2) + ylim(0,1.2)
+plot(r_sdb_plot)
+```
+
+
+
+-----
