@@ -7,3 +7,6 @@
 
 ## 3. [海底地形図の描写](https://github.com/akihirao/how2cook/blob/main/how2draw_ETOPO/Plot.Sea_around_JPN.md)
 ####  日本周辺の海底地形図をRで描写
+
+## 4. [Vcf2PopCluster.pl(https://github.com/akihirao/how2cook/blob/main/Vcf2PopCluster.pl)
+####  集団構造解析プログラムPopCluster(Wang 2022)の入力ファイルをvcfから作成するスクリプト
