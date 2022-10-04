@@ -49,6 +49,12 @@ mv fastp.0.23.1 fastp
 chmod a+x ./fastp
 ```
 
+#### bedtools (a pre-compiled binary for linux)
+```
+wget https://github.com/arq5x/bedtools2/releases/download/v2.30.0/bedtools.static.binary
+mv bedtools.static.binary bedtools
+chmod a+x ./bedtools
+```
 
 #### BWA
 ```
@@ -57,19 +63,19 @@ git clone https://github.com/lh3/bwa.git
 cd bwa; make
 ```
 
-#### samtools: 2022/01/19時点の最新版はv1.14
+#### samtools: 2022/09/12時点の最新版はv1.16.1
 HTSlib入りのソースからコンパイルする例です。HTSlib projectの一部であるtabixとbgzipは使用頻度の高いツールなので、HTSlibもビルドしておきましょう。
 
 ```
 cd /home/hogehoge/local
-wget https://github.com/samtools/samtools/releases/download/1.14/samtools-1.14.tar.bz2
-tar -xvf samtools-1.14.tar.bz2
-cd samtools-1.14
+wget https://github.com/samtools/samtools/releases/download/1.16.1/samtools-1.16.1.tar.bz2
+tar -xvf samtools-1.16.1.tar.bz2
+cd samtools-1.16.1
 ./configure --prefix=/user/hogehoge/local/
 make
 ./samtools --version
-cd htslib-1.14
-./configure
+cd htslib-1.16.1
+./configure --prefix=/user/hogehoge/local/
 make
 ./tabix --version
 ./bgzip --version
@@ -103,4 +109,14 @@ Ver.2.0をbinaryでインストール
 cd /home/hogehoge/local
 wget https://s3.amazonaws.com/plink2-assets/plink2_linux_x86_64_20211217.zip
 unzip plink2_linux_x86_64_20211217.zip
+```
+
+#### vcftools
+Build from release tarball (https://github.com/vcftools/vcftools/releases)
+```
+wget https://github.com/vcftools/vcftools/releases/download/v0.1.16/vcftools-0.1.16.tar.gz
+tar zxvf vcftools-0.1.16.tar.gz
+cd vcftools-0.1.16
+./configure
+make
 ```

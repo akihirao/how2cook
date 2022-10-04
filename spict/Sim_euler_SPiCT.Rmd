@@ -1,0 +1,223 @@
+---
+title: Sim_euler_SPiCT
+output:
+  html_document:
+    df_print: paged
+  word_document: default
+---
+
+-----
+
+####Sim_euler_SPiCT.R
+#SPiCTのdteulerの値の影響をシミュレーションデータで検証する
+
+#ライブライーの読み込み
+
+```{r message = FALSE, warning = FALSE, echo = TRUE}
+library(spict)
+library(frapmfun)
+library(tidyverse)
+library(gridExtra)
+```
+
+#シュミレーションのベースデータの読込および設定
+
+```{r message = FALSE, warning = FALSE, echo = TRUE}
+data_raw <- read.csv("example1.csv") 
+# https://github.com/ichimomo/frapmt/blob/main/raw-data/example1.csv #オリジナルデポジット
+
+inp  <- get_spict_data(data_raw)
+inp$priors$logn <- c(log(1.19), 0.001, 1)
+inp$priors$logr <- c(log(0.4), 0.0001, 1)
+inp$priors$logK <- c(log(1000), 0.001, 1)
+inp$priors$logm <- c(log(134.5543), 0.001, 1)
+inp$priors$logbkfrac <- c(log(0.8), 5, 1)
+inp$priors$logsdf <- c(log(0.3), 10, 0)
+inp$priors$logsdc <- c(log(0.001), 0.001, 1)
+inp$priors$logbeta <- c(log(1), 2, 0)
+inp$priors$logsdb <- c(log(0.3), 10, 0)
+inp$priors$logsdi <- list(c(log(0.3), 10, 0),c(log(0.3), 10, 0))
+inp$priors$logalpha <- c(log(1), 2, 0)
+inp$priors$logq <- list(c(log(0.8), 2, 0), c(log(0.8), 2, 0))
+
+inp <- check.inp(inp)
+inp_sim <- inp
+
+K_true <- 1000　#環境収容力の真の値
+r_true <- 0.4　#内的自然増加率の真の値
+rc_true <- 0.6722689　#内的自然増加率の真の値
+rold_true <- 2.105263　#内的自然増加率の真の値
+n_true <- 1.19　#形状パラメータの真の値
+m_true <- 134.5543
+q_true <- 0.8 #漁具能率
+sdb_true <- 0.3　# 資源量のプロセス誤差
+sdf_true <- 0.3 # 漁獲率のプロセス誤差
+
+inp_sim$ini$logn <- log(n_true)
+inp_sim$ini$logK <- log(K_true)
+inp_sim$ini$logm <- log(m_true)
+inp_sim$ini$logr <- log(r_true)
+inp_sim$ini$logrc <- log(rc_true)
+inp_sim$ini$logrold <- log(rold_true)
+inp_sim$ini$logsdb <- log(sdb_true)
+inp_sim$ini$logsdf <- log(sdf_true)
+
+```
+
+#　シュミレーションデータの発生およびパラメーター推定
+
+```{r message = FALSE, warning = FALSE, echo = TRUE}
+no_sim <- 10 #処理単位のシュミレーション数
+euler_value_series <- c(1/64,1/16,1/4,1)
+#euler_value_series <- c(1/16,1/4,1)
+no_euler_series <- length(euler_value_series)
+
+res_out <- as.list(numeric(no_sim))
+for(i in 1:no_sim){
+  res_out[[i]] <- as.list(numeric(no_euler_series))
+  for(j in 1:no_euler_series){
+     res_out[[i]][[j]] <- as.list(no_euler_series)
+  }
+}
+
+#no rep: k
+for(k in 1:no_sim){
+  for(l in 1:no_euler_series){
+    inp_sim$dteuler <- euler_value_series[j]
+    
+    #シュミレーションデータの生成  
+    sim <- sim.spict(inp_sim)
+    sim$priors$logn <- c(log(1.19),0.0001,1)
+    sim$priors$logr <- c(log(0.5), 0.5, 1)
+    sim$priors$logK <- c(log(1000), 1, 1)
+    sim$priors$logm <- c(log(1e-04), 1, 0)
+    
+    for(m in 1:no_euler_series){
+      sim$dteuler <- euler_value_series[m]
+      #パラメーター推定
+      res_out[[k]][[l]][[m]] <- fit.spict(sim)
+      
+    }
+  }
+}
+
+```
+
+### summarizing parameters
+
+```{r message = FALSE, warning = FALSE, echo = TRUE}
+
+####シミュレーションの結果をtidyデータに出力
+r_estimate <- vector()
+K_estimate <- vector()
+m_estimate <- vector()
+Fmsys_estimate <- vector()
+Bmsys_estimate <- vector()
+MSYs_estimate <- vector()
+sdb_estimate <- vector()
+
+sim_lab <- vector()
+euler_pre_lab <- vector()
+euler_post_lab <- vector()
+
+count_vec <- 1
+for(k in 1:no_sim){
+	for(l in 1:no_euler_series){
+	  	for(m in 1:no_euler_series){
+	  	  
+        pos_r <- match("r",names(res_out[[k]][[l]][[m]]$value))
+        pos_K <- match("K",names(res_out[[k]][[l]][[m]]$value))
+        pos_m <- match("m",names(res_out[[k]][[l]][[m]]$value))
+        pos_sdb <- match("sdb",names(res_out[[k]][[l]][[m]]$value))
+        pos_Bmsys <- match("Bmsys",names(res_out[[k]][[l]][[m]]$value))
+        pos_Fmsys <- match("Fmsys",names(res_out[[k]][[l]][[m]]$value))
+        pos_MSYs <- match("MSYs",names(res_out[[k]][[l]][[m]]$value))
+
+        r_estimate[count_vec] <- res_out[[k]][[l]][[m]]$value[pos_r][[1]]
+        K_estimate[count_vec] <- res_out[[k]][[l]][[m]]$value[pos_K][[1]]
+        m_estimate[count_vec] <- res_out[[k]][[l]][[m]]$value[pos_m][[1]]
+        sdb_estimate[count_vec] <- res_out[[k]][[l]][[m]]$value[pos_sdb][[1]]
+        Bmsys_estimate[count_vec] <- res_out[[k]][[l]][[m]]$value[pos_Bmsys][[1]]
+        Fmsys_estimate[count_vec] <- res_out[[k]][[l]][[m]]$value[pos_Fmsys][[1]]
+        MSYs_estimate[count_vec] <- res_out[[k]][[l]][[m]]$value[pos_MSYs][[1]]
+      
+        sim_lab[count_vec] <- k
+        euler_pre_lab[count_vec] <- euler_value_series[l]
+        euler_post_lab[count_vec] <- euler_value_series[m]
+
+        count_vec <- count_vec + 1
+	    }
+	  }
+}
+
+param <- as.tibble(data.frame(r=r_estimate, K=K_estimate, m=m_estimate, sdb=sdb_estimate, Bmsys=Bmsys_estimate, Fmsys=Fmsys_estimate, MSYs=MSYs_estimate, sim=sim_lab, euler_generate=euler_pre_lab, euler_estimate=euler_post_lab)) %>% mutate(euler_generate_lab=euler_generate, euler_estimate_lab=euler_estimate)
+
+param$eulaer_generate_lab <- sub(0.015625, "1/64",param$eulaer_generate_lab)
+param$eulaer_generate_lab <- sub("0.0625", "1/16",param$eulaer_generate_lab)
+param$eulaer_generate_lab <- sub("0.25", "1/4",param$eulaer_generate_lab)
+param$eulaer_generate_lab <- sub("1", "1",param$eulaer_generate_lab)
+param$eulaer_generate_lab <- factor(param$eulaer_generate_lab, levels=c("1/64","1/16","1/4","1"))
+param$euler_estimate_lab <- sub(0.015625, "1/64",param$euler_estimate_lab)
+param$euler_estimate_lab <- sub("0.0625", "1/16",param$euler_estimate_lab)
+param$euler_estimate_lab <- sub("0.25", "1/4",param$euler_estimate_lab)
+param$euler_estimate_lab <- sub("1", "1",param$euler_estimate_lab)
+param$euler_estimate_lab <- factor(param$euler_estimate_lab, levels=c("1/64","1/16","1/4","1"))
+
+param_summary <- param %>% group_by(eulaer_generate_lab, eulaer_estimate_lab) %>% dplyr::summarise(r_median=format(round(median(r),2),nsmall=2), K_median=format(round(median(K),1),nsmall=1),m_median=format(round(median(m),1),nsmall=1),sdb_median=format(round(median(sdb),3),nsmall=3),Bmsys_median=format(round(median(Bmsys),1),nsmall=1),Fmsys_median=format(round(median(Fmsys),3),nsmall=3),MSYs_median=format(round(median(MSYs),1),nsmall=1),r_CV=format(round(sd(r)/mean(r),3),nsmall=3), K_CV=format(round(sd(K)/mean(K),3),nsmall=3),m_CV=format(round(sd(m)/mean(m),3),nsmall=3),sdb_CV=format(round(sd(sdb)/mean(sdb),3),nsmall=3),Bmsys_CV=format(round(sd(Bmsys)/mean(Bmsys),3),nsmall=3),Fmsys_CV=format(round(sd(Fmsys)/mean(Fmsys),3),nsmall=3),MSYs_CV=format(round(sd(MSYs)/mean(MSYs),3),nsmall=3))
+print(param_summary)
+```
+
+```{r message = FALSE, warning = FALSE, echo = TRUE}
+#r_boxplot <- ggplot(param,aes(x=euler_estimate, y= r, fill=euler_generate)) + ylim(0,2) + labs(x= "Time step") + facet_wrap(.~euler_generate)
+#r_boxplot <- r_boxplot + geom_boxplot()
+
+r_violinplot <- ggplot(param,aes(x=euler_estimate, y= r, fill=euler_generate)) + labs(x = "Time step") + facet_wrap(.~euler_generate)
+r_violinplot <- r_violinplot + geom_violin() 
+r_violinplot <- r_violinplot + geom_quasirandom(size=0.01, alpha=0.5) + geom_hline(yintercept = r_true, linetype="dashed", col="red")
+
+#K_boxplot <- ggplot(param,aes(x=euler_estimate, y= K, fill=euler_generate)) + labs(x= "Time step") + facet_wrap(.~euler_generate)
+#K_boxplot <- K_boxplot + geom_boxplot()
+
+K_violinplot <- ggplot(param,aes(x=euler_estimate, y= K, fill=euler_generate)) + labs(x = "Time step") + facet_wrap(.~euler_generate)
+K_violinplot <- K_violinplot + geom_violin() 
+K_violinplot <- K_violinplot + geom_quasirandom(size=0.01, alpha=0.5) + geom_hline(yintercept = K_true, linetype="dashed", col="red")
+
+#m_boxplot <- ggplot(param,aes(x=euler_estimate, y= m, fill=euler_generate)) + labs(x= "Time step") + facet_wrap(.~euler_generate)
+#m_boxplot <- m_boxplot + geom_boxplot()
+
+m_violinplot <- ggplot(param,aes(x=euler_estimate, y= m, fill=euler_generate)) + labs(x= "Time step") + facet_wrap(.~euler_generate)
+m_violinplot <- m_violinplot + geom_violin() 
+m_violinplot <- m_violinplot + geom_quasirandom(size=0.01, alpha=0.5) + geom_hline(yintercept = m_true, linetype="dashed", col="red")
+
+#sdb_boxplot <- ggplot(param,aes(x=euler_estimate, y= sdb, fill=euler_generate))
+#sdb_boxplot <- sdb_boxplot + geom_boxplot()
+
+sdb_violinplot <- ggplot(param,aes(x=euler_estimate, y= sdb, fill=euler_generate)) + labs(x= "Time step") + facet_wrap(.~euler_generate)
+sdb_violinplot <- sdb_violinplot + geom_violin() 
+sdb_violinplot <- sdb_violinplot + geom_quasirandom(size=0.01, alpha=0.5) + geom_hline(yintercept = sdb_true, linetype="dashed", col="red")
+
+
+#params_plot <- grid.arrange(r_boxplot,K_boxplot, m_boxplot, sdb_boxplot, ncol=2)
+params_plot <- grid.arrange(r_violinplot,K_violinplot, m_violinplot, ncol=1)
+
+plot(params_plot)
+
+
+corr_eqn <- function(x,y, digits = 2) {
+  corr_coef <- round(cor(x, y), digits = digits)
+  corr_p_value <- cor.test(x, y)$p.value
+  paste("italic(r) == ", corr_coef,"~';'~italic(P)==", corr_p_value)
+}
+labels = data.frame(x =1.0, y = 1.2, label = corr_eqn(param$r, param$sdb))
+
+r_sdb_cor_out <- cor.test(param$r,param$sdb)
+
+r_sdb_plot <- ggplot(param) +geom_point(aes(x=r,y=sdb,color=euler_estimate,shape=euler_generate)) + labs(y="sigma_B") + geom_text(data = labels, aes(x = x, y = y,label = label), parse = TRUE) + xlim(0,2) + ylim(0,1.2)
+
+plot(r_sdb_plot)
+```
+
+
+
+
+-----
