@@ -1,8 +1,9 @@
 #!/usr/bin/perl
-#Vcf2PopCluster.pl
-# conversion script from vcf to PopCluster input
-#by HIRAO Akira
-#how to use: perl Vcf2PopCluster.pl <- hogehoge.vcf > hogehoge.dat
+# Vcf2PopCluster.pl
+# conversion script from vcf to PopCluster (Wang 2022)
+# by HIRAO Akira
+# how to use: perl Vcf2PopCluster.pl <- hogehoge.vcf > hogehoge.dat
+# The data format for PopCluster is individual genotypes in 2 rrows.
 
 
 @indiv_genotype = ();
