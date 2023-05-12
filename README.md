@@ -10,3 +10,6 @@
 
 ## 4. [Vcf2PopCluster.pl](https://github.com/akihirao/how2cook/blob/main/Vcf2PopCluster.pl)
 ####  A perl script to convert VCF to input PopCluster format
+
+## 5. [How to extract CDS from a GenBank format file](https://github.com/akihirao/how2cook/blob/main/how2extract_cds_from_gb/notes.md)
+####  requirement: gbseqextractor https://github.com/linzhi2013/gbseqextractor
