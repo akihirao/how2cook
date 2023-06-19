@@ -17,16 +17,20 @@ marp: true
 
 [package hirahira](https://github.com/akihirao/how2cook/blob/main/RpackDev/hirahira_0.1.0.tar.gz) ハンズオン用のトイパッケージ（バンドル形式）
 
-ターミナルからバンドルパッケージをインストール
+ダウンロードしたバンドル形式のパッケージを指定してインストール
+```r
+install.packages("path_to/hirahira_01.0.tar.gz", repos = NULL, type = "source")
+```
+
+ちなみにシェルからもR CMD install コマンドを使ってバンドルパッケージをインストールできます
 ```shell
 R CMD install hirahira_01.0.tar.gz
 ```
 ただしバンドル版では10.2.節のCコードは実装がうまくいっていません（DLLの不調？のため）
 
-
-ハンズオンの終了後に、不必要になれば、パッケージのアンインストールをおすすめします。
+ハンズオンの終了後にはパッケージのアンインストールをおすすめします。
 ```r
-remove.Packages("hirahira")
+remove.packages("hirahira")
 ```
 
 ---
@@ -413,9 +417,9 @@ usethis::use_citation()
 
 ```r
 # 利用可能なすべてのデモのリストを表示
->demo()
+demo()
 
 # graphicsのデモを表示
->demo(graphics)
+demo(graphics)
 ```
 
