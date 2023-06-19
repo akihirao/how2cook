@@ -21,7 +21,7 @@ marp: true
 ## 本章ではC++/CをRパッケージで使う方法を学びます :sparkles:
 スクリプト言語としての表現の豊かさを誇るRのコードに、CやC++を組み込むことで、プログラムの実行速度の向上を保管することができます。
 
-![width:500pt](https://r-pkgs.org/diagrams/install-load.png)
+![width:500pt](https://github.com/akihirao/how2cook/blob/main/RpackDev/C_and_CPP_icons.png)
 
 
 - Rcpp: RからC++を使うためのパッケージ
