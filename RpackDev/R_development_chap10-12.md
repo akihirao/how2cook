@@ -21,7 +21,13 @@ marp: true
 ```
 R CMD install hirahira_01.0.tar.gz
 ```
-（ただし10.2.節のCコードは実装がうまくいっていないことに留意してください）
+ただしバンドル版では10.2.節のCコードは実装がうまくいっていません（DLLの不調？のため）
+
+
+ハンズオンの終了後に、不必要になれば、パッケージのアンインストールをおすすめします。
+```
+remove.Packages("hirahira")
+```
 
 ---
 # 第10章 コンパイル済みのコード
@@ -329,6 +335,12 @@ system.file()を用いる．
 
 ```
 system.file(“doc”, “spict_handbook.pdf”, packaged =“spict”)
+```
+
+例えば、 パッケージhirahiraのinst/bash/check_perl_version.sh のパスを調べるには
+
+```
+system.file(“bash”, “check_perl_version.sh", packaged =“hirahira”)
 ```
 
 ## 11.1 パッケージの引用
