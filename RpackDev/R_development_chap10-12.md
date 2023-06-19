@@ -18,14 +18,14 @@ marp: true
 [package hirahira](https://github.com/akihirao/how2cook/blob/main/RpackDev/hirahira_0.1.0.tar.gz) ハンズオン用のトイパッケージ（バンドル形式）
 
 ターミナルからバンドルパッケージをインストール
-```
+```shell
 R CMD install hirahira_01.0.tar.gz
 ```
 ただしバンドル版では10.2.節のCコードは実装がうまくいっていません（DLLの不調？のため）
 
 
 ハンズオンの終了後に、不必要になれば、パッケージのアンインストールをおすすめします。
-```
+```r
 remove.Packages("hirahira")
 ```
 
@@ -50,7 +50,7 @@ remove.Packages("hirahira")
 
 # 10.1 C++
 Rcppを使う際は、まず最初に次のコマンドを実行
-```
+```r
 usethis::use_rcpp()
 
 # 1) src/の生成
@@ -59,14 +59,14 @@ usethis::use_rcpp()
 ```
 
 パッケージ内の適当なRファイルに次のroxygenタグを追加
-```
+```r
 #' @useDynLib myPackage, .registration=TRUE
 #' @importFrom Rcpp sourceCpp
 NULL
 ```
 
 document()の実行：上記のroxygenタグを介して、NAMESPACEが修正される
-```
+```r
 devtools::document()
 ```
 
@@ -75,7 +75,7 @@ devtools::document()
 1. 新しいC++ファイルの作成
 
    - 例として、数を2倍にするtimesTwo関数を作成し、src/ディレクトリに適当な名前のファイル(hogehoge.cpp)で保存。
-```
+```cpp
 #include <Rcpp.h>
 using namespace Rcpp;
 
@@ -89,7 +89,7 @@ int timesTwo(int x) {
 
 
 2. ビルド＆ラッパー関数の作成
-```
+```r
 Rcpp::sourceCpp("src/hogehoge.cpp")
 ```
 
@@ -97,7 +97,7 @@ Rcpp::sourceCpp("src/hogehoge.cpp")
 3. ラッパー関数（例：timesTwo）の動作確認
 
    - 引数（下記の例は20）の2倍が戻り値ならば、OK
-```
+```r
 timesTwo(20)
 ```
 
@@ -107,7 +107,7 @@ timesTwo(20)
 - ラッパー関数は基本的にR/RcppExports.Rに配置される
 
 以下はtimeTwo関数の例
-```
+```cpp
 #include <Rcpp.h>
 using namespace Rcpp;
 
@@ -121,11 +121,11 @@ int timesTwo(int x) {
 }
 ```
 
-```
+```r
 devtools::document()
 ```
 を実行すると、Rラッパー関数にroxygenタグが自動的に付与される
-```
+```r
 #' 数を２倍する
 #'
 #' @param x 1つの整数
@@ -139,7 +139,7 @@ timesTwo <- function(x) {
 ## 10.1.3 C++コードのエクスポート
 
 - 作成したC++のコードを他のパッケージのC++のコードから呼び出せるようにするには次の属性を追加する
-```
+```cpp
 //　[Rcpp::interfaces(r, cpp)]]
 ```
 
@@ -152,7 +152,7 @@ inst/include/mypackage.hというヘッダーファイルが生成され、他�
 1. DESCRIPTIONに”LinkingTo: otherPackage”との記述を追加する
 
 2. C++ファイル側に以下を追加
-```
+```cpp
 #include <otherPackage.h>
 ```
 
@@ -182,7 +182,7 @@ inst/include/mypackage.hというヘッダーファイルが生成され、他�
 .Call()とはCのコードをRから呼び出すための関数
 
 例として、２つの数値を加算する次のCのコードをmysum.cという名前でsrc/に保存
-```
+```c
 #include <R.h>
 #include <Rinternals.h>
 
@@ -197,13 +197,13 @@ SEXP add_(SEXP x_, SEXP y_){
 ```
 
 Rラッパー関数を作成して、my_add.RとしてR/に保存
-```
+```r
 #’ @useDynLib mypackage add_
 my_add <- function(x,y) .Call(add_, x,y)
 ```
 
 devtools::load_all()してから、動作確認
-```
+```r
 my_add(1,2)
 ```
 
@@ -215,14 +215,14 @@ my_add(1,2)
 参考までにテキストの例を以下に再掲する。
 
 ２つの数値を加算する次のCのコードをsrc.cという名前でsrc/に保存
-```
+```c
 void add_(double* x, double* y, double* out){
   out[0] = x[0] + y[0];
 }
 ```
 
 Rラッパー関数を作成して、my_add.RとしてR/に保存
-```
+```r
 #' @mypackage src.c add_
 add <- function(x ,y) {
    .C(add_, x, y, numeric(1))[[3]]
@@ -239,14 +239,14 @@ add <- function(x ,y) {
 3. ラッパー関数（例：my_add）の動作確認
 
    ２つの引数の合計が戻り値ならば、OK
-```
+```r
 my_add(24,26)
 ```
 
 ## 10.2.4 Cコードのエクスポート
 - Cコードと対応する再配置可能なDLL（=ディスクのどこにおいても動作するDLL)を準備すること！
 - R_RegisterCCallable()関数の登録でDLLの提供が可能となる
-```
+```c
 #include “add.h”
 #include <R_ext/Rdynload.h>
 
@@ -333,19 +333,19 @@ inst/に含まれる一般的なファイル
 system.file()を用いる．
 例えば、 SPiCTのinst/doc/spict_handbook.pdf のパスを調べるには
 
-```
+```r
 system.file(“doc”, “spict_handbook.pdf”, packaged =“spict”)
 ```
 
 例えば、 パッケージhirahiraのinst/bash/check_perl_version.sh のパスを調べるには
 
-```
+```r
 system.file(“bash”, “check_perl_version.sh", packaged =“hirahira”)
 ```
 
 ## 11.1 パッケージの引用
 
-```
+```r
 # Rのbaseバッケージの引用方法を表示
 >citation()
 
@@ -353,7 +353,7 @@ system.file(“bash”, “check_perl_version.sh", packaged =“hirahira”)
 >citation("tidyverse")
 ```
 
-```
+```r
 bibentry(
   "Article",
   title = "Welcome to the {tidyverse}",
@@ -368,7 +368,7 @@ bibentry(
 ```
 
 CITATIONの雛形を作成する関数
-```
+```r
 usethis::use_citation()
 ```
 
@@ -411,7 +411,7 @@ usethis::use_citation()
 
 ## 12.1 デモ
 
-```
+```r
 # 利用可能なすべてのデモのリストを表示
 >demo()
 
