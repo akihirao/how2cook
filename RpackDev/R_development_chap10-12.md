@@ -15,6 +15,14 @@ marp: true
 
 ---
 
+[package hirahira](https://github.com/akihirao/how2cook/blob/main/RpackDev/hirahira_0.1.0.tar.gz) ハンズオン用のトイパッケージ（バンドル形式）
+
+ターミナルからバンドルパッケージをインストール
+```
+R CMD install hirahira_01.0.tar.gz
+```
+
+---
 # 第10章 コンパイル済みのコード
 
 
@@ -358,7 +366,7 @@ usethis::use_citation()
 
  - 他言語の補助スクリプトは基本的にinst/のサブディレクトリに置く（inst/perl, inst/pythonなど）
 
- - 多言語を用いる場合は、DESCRIPTIONにてSystemRequirementsに対応するプログラミング言語を明記する
+ - 他言語を用いる場合は、DESCRIPTIONにてSystemRequirementsに対応するプログラミング言語を明記する
 
  - Javaの場合は特別に ソースコード(java/に置き、.Rinstignoreのリストに追加）とコンパイル済みの.jar(inst/javaに置く）の両方に準備する。またIMPORTSにrJAVAを追加しておく
 
