@@ -13,3 +13,5 @@
 
 ## 5. [How to extract CDS from a GenBank format file](https://github.com/akihirao/how2cook/blob/main/how2extract_cds_from_gb/notes.md)
 ####  requirement: gbseqextractor https://github.com/linzhi2013/gbseqextractor
+
+## 6. [Rパッケージ開発入門　10-12章　輪読会](https://github.com/akihirao/how2cook/blob/main/RpackDev/R_development_chap10-12.md)
