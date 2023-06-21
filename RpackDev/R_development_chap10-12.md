@@ -342,13 +342,13 @@ system.file()を用いる．
 例えば、 SPiCTのinst/doc/spict_handbook.pdf のパスを調べるには
 
 ```r
-system.file("doc", "spict_handbook.pdf", packaged = "spict")
+system.file("doc", "spict_handbook.pdf", package = "spict")
 ```
 
 例えば、 パッケージhirahiraのinst/bash/check_perl_version.sh のパスを調べるには
 
 ```r
-system.file("bash", "check_perl_version.sh", packaged = "hirahira")
+system.file("bash", "check_perl_version.sh", package = "hirahira")
 ```
 
 ## 11.1 パッケージの引用
