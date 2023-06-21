@@ -153,7 +153,7 @@ inst/include/mypackage.hというヘッダーファイルが生成され、他�
 
 ## 10.1.4 C++コードのインポート
 
-1. DESCRIPTIONに”LinkingTo: otherPackage”との記述を追加する
+1. DESCRIPTIONに"LinkingTo: otherPackage"との記述を追加する
 
 2. C++ファイル側に以下を追加
 ```cpp
@@ -251,11 +251,11 @@ my_add(24,26)
 - Cコードと対応する再配置可能なDLL（=ディスクのどこにおいても動作するDLL)を準備すること！
 - R_RegisterCCallable()関数の登録でDLLの提供が可能となる
 ```c
-#include “add.h”
+#include "add.h"
 #include <R_ext/Rdynload.h>
 
 viod R_init_mypackage(DllInfo * info){
-    R_RegisterCCallable(info, “add_”, (DL_FUNC) &add_
+    R_RegisterCCallable(info, "add_", (DL_FUNC) &add_
 }
 ```
 
@@ -338,13 +338,13 @@ system.file()を用いる．
 例えば、 SPiCTのinst/doc/spict_handbook.pdf のパスを調べるには
 
 ```r
-system.file(“doc”, “spict_handbook.pdf”, packaged =“spict”)
+system.file("doc", "spict_handbook.pdf", packaged = "spict")
 ```
 
 例えば、 パッケージhirahiraのinst/bash/check_perl_version.sh のパスを調べるには
 
 ```r
-system.file(“bash”, “check_perl_version.sh", packaged =“hirahira”)
+system.file("bash", "check_perl_version.sh", packaged = "hirahira")
 ```
 
 ## 11.1 パッケージの引用
