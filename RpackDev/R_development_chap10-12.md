@@ -73,7 +73,7 @@ usethis::use_rcpp()
 NULL
 ```
 
-document()の実行：上記のroxygenタグを介して、NAMESPACEが修正される
+document()の実行：上記のroxygenタグを介して、NAMESPACEが修正される。NAMESPACEが修正されない場合("importFrom(Rcpp,sourceCpp)"および"useDynLib(myPackage, .registration=TRUE)"が追記されないなどのケース)では、NAMESPACEファイルを削除してから、document()を試して下さい。
 ```r
 devtools::document()
 ```
@@ -100,6 +100,7 @@ int timesTwo(int x) {
 ```r
 Rcpp::sourceCpp("src/hogehoge.cpp")
 ```
+Rcpp::sourceCpp()の実行前に、windows OSでは　inst/include/フォルダを作成しておく必要があるようです。
 
 
 3. ラッパー関数（例：timesTwo）の動作確認
@@ -127,6 +128,12 @@ using namespace Rcpp;
 int timesTwo(int x) {
   return x * 2;
 }
+```
+
+
+ビルド＆ラッパー関数の作成
+```
+Rcpp::sourceCpp("src/hogehoge.cpp")
 ```
 
 ```r
