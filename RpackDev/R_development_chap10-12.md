@@ -82,6 +82,7 @@ devtools::document()
 
 1. 新しいC++ファイルの作成
 
+   - Rstudioにて New File > C++ File とすると、テンプレートに沿って新規C++ファイルが作成される。
    - 例として、数を2倍にするtimesTwo関数を作成し、src/ディレクトリに適当な名前のファイル(hogehoge.cpp)で保存。
 ```cpp
 #include <Rcpp.h>
@@ -93,14 +94,12 @@ int timesTwo(int x) {
 }
 ```
 
-   - なおRstudioにて New File > C++ File とすると、テンプレートに沿って新規C++ファイルが作成される。
-
 
 2. ビルド＆ラッパー関数の作成
 ```r
 Rcpp::sourceCpp("src/hogehoge.cpp")
 ```
-Rcpp::sourceCpp()の実行前に、windows OSでは　inst/include/フォルダを作成しておく必要があるようです。
+補足：Windows OSでは　Rcpp::sourceCpp()の実行前に inst/include/フォルダを作成しておかないとエラーとなるようです。
 
 
 3. ラッパー関数（例：timesTwo）の動作確認
@@ -131,15 +130,16 @@ int timesTwo(int x) {
 ```
 
 
-ビルド＆ラッパー関数の作成
-```
+ビルド＆ラッパー関数の作成し、
+```r
 Rcpp::sourceCpp("src/hogehoge.cpp")
 ```
 
+document()を実行すると、
 ```r
 devtools::document()
 ```
-を実行すると、Rラッパー関数にroxygenタグが自動的に付与される
+Rラッパー関数にroxygenタグが自動的に付与される
 ```r
 #' 数を２倍する
 #'
