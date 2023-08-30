@@ -11,7 +11,7 @@
 ## 4. [Vcf2PopCluster.pl](https://github.com/akihirao/how2cook/blob/main/Vcf2PopCluster.pl)
 ####  A converter from VCF to PopCluster
 
-## 5. [vcf2newhybrid](https://github.com/akihirao/how2cook/blob/main/vcf2newhybs.py)
+## 5. [vcf2newhybrid.py](https://github.com/akihirao/how2cook/blob/main/vcf2newhybs.py)
 ####  A converter from VCF to NewHybrids
 
 ## 6. [How to extract CDS from a GenBank format file](https://github.com/akihirao/how2cook/blob/main/how2extract_cds_from_gb/notes.md)
