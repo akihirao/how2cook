@@ -9,10 +9,10 @@
 ####  日本周辺の海底地形図をRで描写
 
 ## 4. [Vcf2PopCluster.pl](https://github.com/akihirao/how2cook/blob/main/Vcf2PopCluster.pl)
-####  A perl script for converting VCF to PopCluster format
+####  A converter from VCF to PopCluster
 
 ## 5. [vcf2newhybrid](https://github.com/akihirao/how2cook/blob/main/vcf2newhybs.py)
-####  A python script for converting VCF to NewHybrids (Anderson and Thompson 2002)
+####  A converter from VCF to NewHybrids
 
 ## 6. [How to extract CDS from a GenBank format file](https://github.com/akihirao/how2cook/blob/main/how2extract_cds_from_gb/notes.md)
 ####  requirement: gbseqextractor https://github.com/linzhi2013/gbseqextractor
