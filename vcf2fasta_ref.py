@@ -4,7 +4,7 @@
 
 '''
 Usage:
-    python vcf2ref_fa.py -i sample.vcf (or sample.vcf.gz) -i output.fasta
+    python vcf2ref_fa.py -i sample.vcf (or sample.vcf.gz) -o output.fasta
     This script was tested under python 3.9 on conda with pyvcf
 '''
 
