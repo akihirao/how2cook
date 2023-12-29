@@ -27,22 +27,22 @@ $no_argv=@ARGV;
 # ID-Population
 
 if($no_argv== 2){
+
 	$FILE_MAP_name = $ARGV[1];
 	print $FILE_MAP_name, "\n";
 	open (FILE_MAP, $FILE_MAP_name) or die "Failed to open a map file\n";
 
-
 	%id_pop_list = ();
+
 	while ($line = <FILE_MAP>){
 		chomp $line;
 		($ID, $Population)= split /\s+/, $line;
 		$id_pop_list{$ID} = $Population;
 	}
+
 	close(FILE_MAP);
 }
 #------------------------------------------
-
-
 
 
 #------------------------------------------
