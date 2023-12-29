@@ -1,9 +1,9 @@
-#!/bin/perl
+#!/usr/bin/perl
 # vcfgz2BA3_input.pl
 # Converter from vcf.gz to a input file for BayesAss3 (BA3)
-# 
+#
 # how to use:
-# I. Output With population-indexing 
+# I. Output With population-indexing
 # i) perl vcf2BA3_input.pl hogehoge.vcf.gz ID_Pop.map > hogehoge.BA3
 #
 # A map file provides links between individual IDs and population IDs. For example,
@@ -29,7 +29,7 @@ $no_argv=@ARGV;
 if($no_argv== 2){
 
 	$FILE_MAP_name = $ARGV[1];
-	print $FILE_MAP_name, "\n";
+
 	open (FILE_MAP, $FILE_MAP_name) or die "Failed to open a map file\n";
 
 	%id_pop_list = ();
