@@ -20,5 +20,7 @@ seqkit locate hogehoge.fasta -p $gap_seq --bed --only-positive-strand > assembly
 ```
 make_annotation_file_DDBJ.pl hogehoge.fasta assembly_gap.bed > hogehoge.ann.txt
 ```
-4.  D-wayアカウントで https://mss.ddbj.nig.ac.jp/ にログイン
-5.  MSS Form に記入、ファイルアップロード、査定の開始
+* SUBMITTERやREFERENCE, DATEなどの書式については、それぞれのケースに合わせてスクリプトを編集した上で、使用してください
+* このスクリプトはbiological featureの記載はsource と assembly_gap のみの記載を目的としていますので、CDSなどのアノテーションは別途追記ください
+4. D-wayアカウントで https://mss.ddbj.nig.ac.jp/ にログイン
+5. MSS Form に記入、ファイルアップロード、査定の開始
