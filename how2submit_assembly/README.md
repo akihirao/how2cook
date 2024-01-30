@@ -16,7 +16,7 @@
 gap_seq=$(yes 'N' | head -n 100 | tr -d '\n') # when size of assembly gap is 100 bp
 seqkit locate hogehoge.fasta -p $gap_seq --bed --only-positive-strand > assembly_gap.bed
 ```
-3. [アノテーション作成用スクリプト: make_annotation_file_DDBJ.pl](make_annotation_file_DDBJ.pl)を用いてアノテーションファイルを作成
+3. Perlスクリプト [make_annotation_file_DDBJ.pl](make_annotation_file_DDBJ.pl) を用いてアノテーションファイルを作成
 ```
 make_annotation_file_DDBJ.pl hogehoge.fasta assembly_gap.bed > hogehoge.ann.txt
 ```
