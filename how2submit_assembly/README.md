@@ -5,23 +5,20 @@
 ## [MSSの概要](https://www.ddbj.nig.ac.jp/ddbj/mss.html)
 
 ## 準備するもの
-* ゲノムアッセンブリーの塩基配列ファイル（fasta形式: .fasta .seq.fa .fa .fna .seq）
-* アノテーションファイル（プレインテキスト: .ann .annt.tsv ann.txt
--　塩基配列ファイルとアノテーションファイルの名称は、拡張子を除く名前が同一なペアになるように準備しておく
+1. ゲノムアッセンブリーのfastaファイル（拡張子は .fasta, .seq.fa, .fa, .fna, .seqに対応）
+2. アノテーションファイル（[様式について](https://www.ddbj.nig.ac.jp/ddbj/file-format.html#annotation)）（拡張子は .ann, .annt.tsv, ann.txtに対応)
+* 塩基配列ファイルとアノテーションファイルは、拡張子を除くそれぞれの名前が同じペアになるようにすること
 
 ## MSS登録の流れ
-- 1. ゲノムアッセンブリーの塩基配列ファイルをfasta形式で作成
-- 2. アッセンブリーギャップのポジションのリストをbed形式で作成
+1. ゲノムアッセンブリーの塩基配列ファイルを準備
+2. アッセンブリーギャップのポジションのリストを bedで作成
 ```
-gap_seq="NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
-seqkit locate hogehoge.fasta -p $gap_seq --bed --only-positive-strand > hogehoge.ann.txt
+gap_seq=$(yes 'N' | head -n 100 | tr -d '\n') # when size of assembly gap is 100 bp
+seqkit locate hogehoge.fasta -p $gap_seq --bed --only-positive-strand > assembly_gap.bed
 ```
-- 3. [アノテーションファイル作成用スクリプト](make_annotation_file_DDBJ.pl)を用いてアノテーションファイルを作成
-- 4.  D-wayアカウントで https://mss.ddbj.nig.ac.jp/ にログイン
-- 5.  MSS Form に記入、ファイルアップロード、査定の開始
-
-## [アノテーションファイル作成用スクリプト: make_annotation_file_DDBJ.ol](make_annotation_file_DDBJ.pl)
-* 同じフォルダにゲノムアッセンブリーのfastaファイルとアセンブリーギャップのbedファイルおよび当該スクリプトを置いて、実行
+3. [アノテーション作成用スクリプト: make_annotation_file_DDBJ.pl](make_annotation_file_DDBJ.pl)を用いてアノテーションファイルを作成
 ```
-make_annotation_file_DDBJ.pl hogehoge.fasta hogehoge.bed > hogehoge.ann.txt
+make_annotation_file_DDBJ.pl hogehoge.fasta assembly_gap.bed > hogehoge.ann.txt
 ```
+4.  D-wayアカウントで https://mss.ddbj.nig.ac.jp/ にログイン
+5.  MSS Form に記入、ファイルアップロード、査定の開始
