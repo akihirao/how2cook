@@ -18,7 +18,10 @@
 - [vcf2fasta_ref.py](https://github.com/akihirao/how2cook/blob/main/vcf2fasta_ref.py): A converter from VCF to fasta for haploidy reference genome
 - [vcfgz2BA3.pl](https://github.com/akihirao/how2cook/blob/main/vcfgz2BA3.pl): A converter from VCF gz to BayesAss3 (BA3)
 
-## 6. [How to extract CDS from a GenBank format file](https://github.com/akihirao/how2cook/blob/main/how2extract_cds_from_gb/notes.md)
+## 6. KMLマップ変換ツール
+- [csv2kml.py](https://github.com/akihirao/how2cook/blob/main/csv2kml.py): A converter from coordinate csv to KML
+
+## 7. [How to extract CDS from a GenBank format file](https://github.com/akihirao/how2cook/blob/main/how2extract_cds_from_gb/notes.md)
 ####  requirement: gbseqextractor https://github.com/linzhi2013/gbseqextractor
 
-## 7. [Rパッケージ開発入門　10-12章　輪読会](https://github.com/akihirao/how2cook/blob/main/RpackDev/R_development_chap10-12.md)
+## 8. [Rパッケージ開発入門　10-12章　輪読会](https://github.com/akihirao/how2cook/blob/main/RpackDev/R_development_chap10-12.md)
