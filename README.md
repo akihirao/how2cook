@@ -17,6 +17,8 @@
 - [vcf2fasta_mt.py](https://github.com/akihirao/how2cook/blob/main/vcf2fasta_mt.py): A converter from VCF to multiple fasta for haploidy mitogenome
 - [vcf2fasta_ref.py](https://github.com/akihirao/how2cook/blob/main/vcf2fasta_ref.py): A converter from VCF to fasta for haploidy reference genome
 - [vcfgz2BA3.pl](https://github.com/akihirao/how2cook/blob/main/vcfgz2BA3.pl): A converter from VCF gz to BayesAss3 (BA3)
+- [vcf2allele_depth_count_het.pl](https://github.com/akihirao/how2cook/blob/main/vcf2allele_depth_count_het.pl): Alternative allele depth ration in heterozygous genotypes
+
 
 ## 6. KMLマップ変換ツール
 - [csv2kml.py](https://github.com/akihirao/how2cook/blob/main/csv2kml.py): A converter from coordinate csv to KML
