@@ -1,7 +1,7 @@
 #!/usr/bin/perl
-#Vcf2allele_depth_count_hetero.pl
-#by HIRAO Akira
-# how to use: ./vcf2allele_depth_count_het.pl < hogehoge.vcf > hogehoge.allele_depth_ratio.txt
+# Vcf2allele_depth_ratio.pl
+# by HIRAO Akira
+# how to use: ./vcf2allele_depth_ratio.pl < hogehoge.vcf > hogehoge.allele_depth_ratio.txt
 
 
 while ($line = <>) {
