@@ -1,5 +1,5 @@
 # 遺伝研スパコンへのログインと共有ディレクトリーの設定
-@2025/10/35
+
 
 ## 遺伝研スパコンへのログインの流れ
 遺伝研公式ページ　https://sc.ddbj.nig.ac.jp/guides/using_general_analysis_division/  
@@ -23,36 +23,36 @@ ssh a001　# a001へのログインの例
 
 ***
 ## 共有ディレクトリーの設定
-まず自分が現在いるディレクトリを確認しておく。
+現在のディレクトリの場所を確認する。
 ```bash
 pwd
 ```
-アカウント名 hogehogeがインタラクティブノードにログインした直後ならば、次のディレクが表示される。
+インタラクティブノードにログインした直後ならば、アカウント名 hogehogeでは次のディレクトリが表示される。
 ```bash
 /home/hogehoge
 ```
 
-hogehogeフォルダの直下に共有作業ディレクトリ（たとえばkokemomoと名付ける）を新規に作成する。
+hogehogeフォルダの直下に共有作業ディレクトリ（たとえばkokemomoと名付ける）を新規に作成。
 ```bash
 mkdir ~/kokemomo # ~/はホームディレクトリを示す
 ```
 共有フォルダkokemomoでの作業を行う前に、newgrpコマンドでグループを変更してから作業する。
 
-仮にグループ名がlingonberryとすると
+
 ```bash
-newgrp lingonberry
+newgrp lingonberry　#グループ名がlingonberryの場合
 ```
-kokemomoフォルダをグループ KudoLabで共有します。
+kokemomoフォルダをグループ lingonberryで共有。
 ```bash
 chgrp -R lingonberry ~/kokemomo
 ```
-共有フォルダkokemomoにグループパーミションとして、read/write/exeをつける
+共有フォルダkokemomoにグループのパーミションとして、読み込み/書き出し／実行（read/write/exe）を許可。
 ```bash
 chmod g+x ~/kokemomo
 ```
-フォルダのread/write/exe権限などを確認する
+フォルダの実行権限を確認。
 ```bash
-ls -la g+x ~/kokemomo
+ls -la ~/kokemomo
 ```
 
 ***

@@ -5,7 +5,7 @@
 ## 2. [リードデータのDRAへの登録方法](https://github.com/akihirao/how2cook/tree/main/how2submit_DRA)
 ####  多検体のリードデータをDRAへ登録する方法の覚書
 
-## 3. [遺伝研スパコンに関する覚書](How2useNIGsupercomp.md)
+## 3. [遺伝研スパコンに関する覚書](https://github.com/akihirao/how2cook/tree/main/How2useNIGsupercomp.md)
 
 ## 4. [ゲノムアッセンブリーのDDBJへの登録方法](https://github.com/akihirao/how2cook/tree/main/how2submit_assembly)
 ####  新規のゲノムアッセンブリーをMass Submission Ssytemを介してDDBJに登録する方法の覚書
