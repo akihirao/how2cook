@@ -61,16 +61,32 @@ ls -la ~/kokemomo
 
 ### SSH プロトコルによるファイル転送の方法 (scp, sftp)
 
-自分のPCにて、ターミナルを介してカレントディレクトリにある your_file.txt ファイルを遺伝研スパコンに scp するには、 以下のコマンドを実行する。
+1. アップロード  
+自分のPCの中に your_upload_file.txtを遺伝研スパコンへアップロード (以下の例では/home/hogehoge/の直下にアップされる)
 ```bash
-scp your_file.txt hogehoge@gw.ddbj.nig.ac.jp:/home/hogehoge
+scp your_upload_file.txt hogehoge@gw.ddbj.nig.ac.jp:/home/hogehoge
 ```
-
 カレントディレクトリに A001_R1.fastq.gz,A001_R2.fastq.gz, A002_R1.fastq.gz, A002_R2.fastq.gzなどと複数のリードファイルがあり、それらを一挙にスパコン上のkokemomoフォルダに転送するには、以下のコマンドを実行する。
 ```bash
 scp *.fastq.gz hogehoge@gw.ddbj.nig.ac.jp:/home/hogehoge/kokemomo
 ```
 
+2. ダウンロード  
+遺伝研スパコンの中にあるファイルを自分のPCへダウンロード (以下の例では自分のPCのホームフォルダの直下にダウンロードされる）
+```bash
+scp hogehoge@gw.ddbj.nig.ac.jp:/home/hogehoge/your_upload_file.txt ~/
+```
+
+3. フォルダ内のファイル一式をホストからリモート（またはリモートからホスト）に転送　　
+rsyncを使うと便利
+https://heavywatal.github.io/dev/rsync.html
+```bash
+# send: ホストからリモートへ
+rsync -auvC ~/input/ gw.ddbj.nig.ac.jp:~/input/
+
+# receive：リモートからホストへ
+rsync -auvC gw.ddbj.nig.ac.jp:~/output/ ~/output/
+```
 
 ***
 ## Slurmによるジョブの実行
@@ -82,6 +98,58 @@ man sbatch
 sbatch --help
 sbatch test_run.sh
 ```
+
+test_run.shの例
+
+```bash
+#!/bin/bash
+# test_run.sh
+
+#SBATCH -N 1
+#SBATCH -n 1
+#SBATCH -c 1
+#SBATCH -t 00-00:01:00
+#SBATCH --mem-per-cpu=1G
+#SBATCH -J print
+
+#########YOUR JOB#############
+WORKDIR=${HOME}"/temp"
+mkdir -p ${WORKDIR}
+cd ${WORKDIR}
+
+output_file="test_log.txt"
+timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+
+date -Iseconds
+
+echo "Execution Time: $timestamp" > $output_file
+
+echo SLURM_ARRAY_JOB_ID: ${SLURM_ARRAY_JOB_ID-} >> $output_file
+echo SLURM_ARRAY_TASK_ID: ${SLURM_ARRAY_TASK_ID-}
+echo SLURM_ARRAY_TASK_COUNT: ${SLURM_ARRAY_TASK_COUNT-} >> $output_file
+echo SLURM_ARRAY_TASK_MIN: ${SLURM_ARRAY_TASK_MIN-} >> $output_file
+echo SLURM_ARRAY_TASK_MAX: ${SLURM_ARRAY_TASK_MAX-} >> $output_file
+echo SLURM_ARRAY_TASK_STEP: ${SLURM_ARRAY_TASK_STEP-} >> $output_file
+echo SLURM_JOB_ID: ${SLURM_JOB_ID-} >> $output_file
+echo SLURM_JOB_NAME: ${SLURM_JOB_NAME-} >> $output_file
+echo SLURM_JOB_NODELIST: ${SLURM_JOB_NODELIST-} >> $output_file
+echo SLURM_JOB_PARTITION: ${SLURM_JOB_PARTITION-} >> $output_file
+echo SLURM_JOB_START_TIME: ${SLURM_JOB_START_TIME-} >> $output_file
+echo SLURM_MEM_PER_CPU: ${SLURM_MEM_PER_CPU-} >> $output_file
+echo SLURM_MEM_PER_NODE: ${SLURM_MEM_PER_NODE-} >> $output_file
+echo SLURM_SUBMIT_DIR: ${SLURM_SUBMIT_DIR-} >> $output_file
+echo SLURM_SUBMIT_HOST: ${SLURM_SUBMIT_HOST-} >> $output_file
+echo SLURM_TASK_PID: ${SLURM_TASK_PID-} >> $output_file
+echo SLURMD_NODENAME: ${SLURMD_NODENAME-} >> $output_file
+
+echo HOME: ${HOME-} >> $output_file
+echo USER: ${USER-} >> $output_file
+echo PWD: ${PWD-} >> $output_file
+echo PATH: ${PATH-} >> $output_file
+
+date -Iseconds
+```
+
 
 ***
 ## singularityを介したソフトウェアの利用
@@ -167,7 +235,11 @@ done < ${HOME}"/temp/sample_list.txt" #list of ID
 ```
 
 ***
-## 他の参考ページ
+## vimの使い方の解説ページ
+https://qiita.com/okamos/items/c97970ab34ff55ff3167
+
+***
+## 遺伝研スパコン利用の参考ページ
 * 岩嵜 航さんの解説メモ　https://heavywatal.github.io/bio/nig.html
 
 
