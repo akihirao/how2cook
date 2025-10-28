@@ -62,7 +62,7 @@ ls -la ~/kokemomo
 ### SSH プロトコルによるファイル転送の方法 (scp, sftp)
 
 1. アップロード  
-自分のPCの中に your_upload_file.txtを遺伝研スパコンへアップロード (以下の例では/home/hogehoge/の直下にアップされる)
+手元のPC(ホスト)のyour_upload_file.txtを遺伝研スパコン（リモート）へアップロード
 ```bash
 scp your_upload_file.txt hogehoge@gw.ddbj.nig.ac.jp:/home/hogehoge
 ```
@@ -72,9 +72,9 @@ scp *.fastq.gz hogehoge@gw.ddbj.nig.ac.jp:/home/hogehoge/kokemomo
 ```
 
 2. ダウンロード  
-遺伝研スパコンの中にあるファイルを自分のPCへダウンロード (以下の例では自分のPCのホームフォルダの直下にダウンロードされる）
+遺伝研スパコン（リモート）の中にあるファイルを手元のPC（ホスト）へダウンロード
 ```bash
-scp hogehoge@gw.ddbj.nig.ac.jp:/home/hogehoge/your_upload_file.txt ~/
+scp hogehoge@gw.ddbj.nig.ac.jp:/home/hogehoge/your_download_file.txt ~/
 ```
 
 3. [rsync](https://heavywatal.github.io/dev/rsync.html)を用いてフォルダ内のファイル一式をホストからリモート（またはリモートからホスト）に転送  
