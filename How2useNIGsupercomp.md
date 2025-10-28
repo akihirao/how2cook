@@ -77,15 +77,14 @@ scp *.fastq.gz hogehoge@gw.ddbj.nig.ac.jp:/home/hogehoge/kokemomo
 scp hogehoge@gw.ddbj.nig.ac.jp:/home/hogehoge/your_upload_file.txt ~/
 ```
 
-3. フォルダ内のファイル一式をホストからリモート（またはリモートからホスト）に転送　　
-rsyncを使うと便利
-https://heavywatal.github.io/dev/rsync.html
+3. [rsync](https://heavywatal.github.io/dev/rsync.html)を用いてフォルダ内のファイル一式をホストからリモート（またはリモートからホスト）に転送  
+
 ```bash
 # send: ホストからリモートへ
-rsync -auvC ~/input/ gw.ddbj.nig.ac.jp:~/input/
+rsync -auvC ~/input/ hogehoge@gw.ddbj.nig.ac.jp:~/input/
 
 # receive：リモートからホストへ
-rsync -auvC gw.ddbj.nig.ac.jp:~/output/ ~/output/
+rsync -auvC hogehoge@gw.ddbj.nig.ac.jp:~/output/ ~/output/
 ```
 
 ***
