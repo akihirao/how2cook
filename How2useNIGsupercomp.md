@@ -36,8 +36,9 @@ hogehogeフォルダの直下に共有作業ディレクトリ（たとえばkok
 ```bash
 mkdir ~/kokemomo # ~/はホームディレクトリを示す
 ```
-共有フォルダkokemomoでの作業を行う前に、newgrpコマンドでグループを変更してから作業する。
 
+共有フォルダkokemomoでの作業を行う前に、必ずnewgrpコマンドでグループを変更してから作業すること！  
+（下記のグループ変更を行わないと、他のグループメンバーがアクセスできないファイル類が作成されてしまう）
 
 ```bash
 newgrp lingonberry　#グループ名がlingonberryの場合
@@ -46,10 +47,14 @@ kokemomoフォルダをグループ lingonberryで共有。
 ```bash
 chgrp -R lingonberry ~/kokemomo
 ```
-共有フォルダkokemomoにグループのパーミションとして、読み込み/書き出し／実行（read/write/exe）を許可。
+共有フォルダkokemomoにグループのパーミションとして、読み込み/書き出し／実行（read/write/execを）を許可。
 ```bash
-chmod g+x ~/kokemomo
+chmod -R g+rwX ~/kokemomo
 ```
+-R: ディレクトリ構造に対して再帰的に権限付.   
+g+rwX: グループ（g)に対してread/write/exec を付与.  
+(xは全てを対象とするのに対して、Xはディレクトリまたは既に実行権のあるファイルに実行権を付与)  
+
 フォルダの実行権限を確認。
 ```bash
 ls -la ~/kokemomo
