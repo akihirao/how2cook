@@ -13,7 +13,7 @@ $max_CV: 最大カバレッジの閾値（推奨値：平均カバレッジの�
 
 
 2. Pamcfa形式ファイルの生成
-Psmcfaファイルは２つのハプロタイプ間で変異があるかどうかを(デフォルトでは100bp間隔毎に)記録
+Psmcfaファイルには２つのハプロタイプ間で変異があるかどうか(デフォルトでは100bp間隔毎に)の情報が記録される。
 ```bash
 fq2psmcfa hogehoge.fq.gz > hogehoge.psmcfa
 ```
@@ -45,13 +45,15 @@ done
 
 
 ## Atomic time intervals(p)の設定について
-区間の設定は難しい問題で、ある程度の試行錯誤が求められる。本家ページの設定例はヒト用であり、そのままに他の生物種に適用しても望ましい結果が得られないかもしれない。信頼のおける推定が行われていることの目安として、各区間の組み替えの回数が10以上であることが推奨されている("The `-p' and `-t' options are manually chosen such that after 20 rounds of iterations, at least ~10 recombinations are inferred to occur in the intervals each parameter spans.") 。  
+区間の設定は難しい問題で、ある程度の試行錯誤が必要。本家ページの設定の例はヒト用であり、そのままの設定を他の生物種に用いても望ましい結果が得られないかもしれない。信頼のおける推定結果の目安として、各区間の組み替えの回数が10以上であることが推奨されている("The `-p' and `-t' options are manually chosen such that after 20 rounds of iterations, at least ~10 recombinations are inferred to occur in the intervals each parameter spans.") 。  
 
-[区間毎の組み替え回数の求め方に関するQ&A](https://github.com/lh3/psmc/issues/45)
+[区間毎の組み替え回数の求め方に関する本家ページのQ&A](https://github.com/lh3/psmc/issues/45)
 
+PSMCにおけるアーティファクトとして、false population size peaks (急激な集団サイズの上昇とそれに続く崩壊的な減少)がしばしば発生することが、実データおよびシミュレーションによって示されている (Hilgers et al 2025)。その対応方法として、first time intervalの分割設定（たとえば '2+2+2+23x2+6') が有効とされるが、万能の解決策でないことに注意。
 
 ## 参考資料
 * Li & Durbin (2011) Inference of human population history from individual whole-genome sequences. Nature: 475, 493–496. https://doi.org/10.1038/nature10231 
+* Hilgers et (2025) Avoidable false PSMC population size peaks occur across numerous studies. Current Biology: 35, 927–930. https://doi.org/10.1016/j.cub.2024.09.028
 * [PSMCの本家ページ](https://github.com/lh3/psmc)   
 * [「ゲノム多様性解析」](https://www.morikita.co.jp/books/mid/026171)（長田直樹編著、森北出版、2025)]  
 第8章「集団サイズの推定」において、PSMCの解説とコード例が紹介。
