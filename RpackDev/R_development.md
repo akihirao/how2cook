@@ -5,7 +5,7 @@ marp: true
 
 
 # Rパッケージ開発入門（第1版）
-Hadley Wickham　著、瀬戸山 雅人、石井 弓美子、古畠 敦　訳
+Hadley Wickham　著、瀬戸山 雅人、石井 弓美子、古畠 敦　訳   
 https://www.oreilly.co.jp/books/9784873117591
 
 ## 2023年輪読会メモ＠資源解析G
